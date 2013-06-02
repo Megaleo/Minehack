@@ -7,10 +7,7 @@ module Block where
 --
 -- @Substitute some "Int" with "Roll from to n-times".
 
-
-import System.Console.ANSI
 import System.IO
-import System.Random 
 import Control.Monad
 import Data.Array
 

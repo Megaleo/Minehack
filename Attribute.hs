@@ -15,9 +15,8 @@ module Attribute where
 -- @ Slows down your moviments and attacks
 -- @ May be given by a potion or running without resting/eating 
 
-import System.Console.ANSI
+
 import System.IO
-import System.Random 
 import Control.Monad
 import Data.Array
 

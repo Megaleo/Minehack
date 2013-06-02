@@ -10,10 +10,7 @@ module Item where
 --
 -- There will be many more other others modules and classes to specify the big "Item" class, 
 
-
-import System.Console.ANSI
 import System.IO
-import System.Random 
 import Control.Monad
 import Data.Array
 

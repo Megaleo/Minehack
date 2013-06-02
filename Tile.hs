@@ -3,9 +3,7 @@ module Tile where
 -- "TileType.Blessedness" for (bless/curse)able tiles
 -- "TileType.Worth"       for valuable tiles
 
-import System.Console.ANSI
 import System.IO
-import System.Random 
 import Control.Monad
 import Data.Array
 
