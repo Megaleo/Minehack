@@ -5,11 +5,12 @@ import System.IO
 import System.Random 
 import Control.Monad
 
-import World
-import Tile
-import Item
-import Block
-import Player
+import qualified World as W
+import qualified Tile as T
+import qualified Item as I
+import qualified Block as B
+import qualified Player as P
+import qualified Attribute as A
 
 main = do
   putStrLn "Oi"
