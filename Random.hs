@@ -7,7 +7,7 @@ import Test.QuickCheck
 roll :: Int -> Int -> Int -> Int -> Int
 roll min max determinant gen = round (toEnum(randomRs (min, (max * 100)) (mkStdGen gen) !! (determinant `mod` 100)) / 100)
 
--- Testing for longer it takes to a number repeate in a list 
+-- Testing for how far it takes to a number repeat in a list 
 repPeriod :: Int -> [Int] -> Int
 repPeriod equal list = minimum . diffs . fst . unzip . filter equals $ zip [1..(length list)] list
   where 
