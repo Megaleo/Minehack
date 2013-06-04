@@ -26,4 +26,7 @@ class TileType a where
 -- damage or the intelligence level of a Player.
 data Tile a b where
   Tile  :: (TileType a, A.Attribute b) => a -> [b] -> Tile a [b]
-  Above :: (TileType a, A.Attribute b) => Tile a [b] -> Tile a [b] -- One tile above the other
+   -- One tile above the other
+  Above :: (TileType a, A.Attribute b) => Tile a [b] -> Tile a [b] -> Tile a [b]
+
+  
