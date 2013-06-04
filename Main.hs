@@ -11,6 +11,7 @@ import qualified Item as I
 import qualified Block as B
 import qualified Player as P
 import qualified Attribute as A
+import qualified Random as R
 
 main = do
   putStrLn "Oi"
