@@ -29,4 +29,10 @@ data Tile a b where
    -- One tile above the other
   Above :: (TileType a, A.Attribute b) => Tile a [b] -> Tile a [b] -> Tile a [b]
 
+-- Return all the TileType(s) and the Attributes of a Tile
+listTileContents :: (TileType a, A.Attribute b) => Tile a [b] -> [(a, [b])]
+listTileContents (Tile a [b])          = [(a, [b])]
+listTileContents (Above tile_a tile_b) = concat [ listTileContents tile_a
+                                                , listTileContents tile_b] 
+
   
