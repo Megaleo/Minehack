@@ -18,6 +18,7 @@ data Roll where
 
 roll :: Roll -> Int
 roll (Roll min max seed) = rollSeed min max (seed `mod` 200) seed
+roll (Fix value)         = value
 
 -- Testing for how far it takes to a number repeat in a list 
 repPeriod :: Int -> [Int] -> Int
