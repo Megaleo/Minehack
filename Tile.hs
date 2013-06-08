@@ -13,13 +13,16 @@ import qualified Attribute as A
 class TileType a where
 
 --Tile's unique ID
-  id     :: a -> Int
+  id        :: a -> Int
 
 --Tile's unique symbol
-  symbol :: a -> Char
+  symbol    :: a -> Char
 
 --Tile's unique name
-  name   :: a -> String
+  name      :: a -> String
+
+-- Condition to Spawn in the world
+  spawnCond :: a -> Int -> Bool
 
 -- Tile is the representation of each piece in a world, it has a type (Block, Item or Player) and
 -- their own Attributes (Attribute) that specify the aspects of a tile in the world, like the block
