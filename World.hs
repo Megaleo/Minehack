@@ -22,6 +22,12 @@ tileChunk (x, y) = (new x, new y)
   where
     new var = floor $ (toEnum var) / 16 
 
-
+chunkRange :: ChunkCoord -> (TileCoord, TileCoord)
+chunkRange (x, y) = ((min x,min y),(max x, max y))
+  where
+    min = (*) 16
+    max = (+) 15 . min 
     
+isInChunkRange :: TileCoord -> ChunkCoord -> Bool
+isInChunkRange tileC chunkC = tileChunk tileC == chunkC   
 

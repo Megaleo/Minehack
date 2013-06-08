@@ -9,6 +9,8 @@ import Data.Array
 
 import qualified Attribute as A
 
+type Coord = (Int, Int)
+
 -- Basically, what can be Tile (e.g. Block, Item, Moster, Player, etc.)
 class TileType a where
 
@@ -22,7 +24,7 @@ class TileType a where
   name      :: a -> String
 
 -- Condition to Spawn in the world
-  spawnCond :: a -> Int -> Bool
+  spawnCond :: a -> Int -> Coord -> Bool
 
 -- Tile is the representation of each piece in a world, it has a type (Block, Item or Player) and
 -- their own Attributes (Attribute) that specify the aspects of a tile in the world, like the block
