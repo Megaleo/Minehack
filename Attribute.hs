@@ -30,3 +30,8 @@ class Attribute a where
   
 --Attribute's Effects
 --effects :: [Effect]
+
+data NoAttributes = NoAttributes
+instance Attribute NoAttributes where
+  id   _ = -1
+  name _ = "No Attributes" 

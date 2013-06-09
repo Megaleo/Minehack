@@ -26,3 +26,12 @@ class T.TileType a => Item a where
 --Item's Weight			                           
   weight    :: a -> Int    	 
 
+data Wood = Wood
+instance T.TileType Wood where
+  id _     = 1
+  name _   = "Wood"
+  symbol _ = 'w'
+instance Item Wood where
+  maxStack _ = 64
+  weight _   = 10
+
