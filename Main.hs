@@ -1,3 +1,5 @@
+{-# LANGUAGE RankNTypes, ConstraintKinds, FlexibleContexts #-}
+
 module Main where
 
 import UI.NCurses
