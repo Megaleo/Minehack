@@ -12,22 +12,31 @@ import qualified Random as R
 
 -- Caracteristics to be an Block (class or data?)
 class T.TileType a => Block a where
-
 --Block's Visibility 
   seeThrough  :: a -> Bool --seeThrough :: a -> ColorSpectrum -> Bool       
-
 --Block's "Walk and stand over" caracteristic (with damage value)                    
-  walkThrough :: a -> R.Roll -> Bool  
-
+  walkThrough :: a -> Maybe R.Roll  
 --Block's Fixed amount of hits to break (Initial damage value)		    	         
   hitstoBreak :: a -> R.Roll 
-
 --Block's Weight		    	         
-  weight      :: a -> Int -- weight :: a -> a -> Weight         
-				           
+  weight      :: a -> Int -- weight :: a -> a -> Weight         			           
 --Block's drop when broken				           
-  drops       :: (T.TileType b) => a -> Maybe [b]          
-                             
+  drops       :: a -> Maybe [a]                                      
 --Block's physical material
 --material    :: a -> [Block.RawMaterial]
-                            
+
+-- Blocks for Testing Purposes
+
+data Air = Air deriving (Show, Eq) 
+instance T.TileType Air where
+  id _     = 0
+  name _   = "Air"
+  symbol _ = ' '
+  spawnCond _ _ _ = True 
+instance Block Air where
+  seeThrough _  = True
+  walkThrough _ = Just (R.Fix 0)
+  hitstoBreak _ = R.Fix 0
+  weight _      = 0
+  drops _       = Just [Air]
+  

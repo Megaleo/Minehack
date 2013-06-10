@@ -15,22 +15,24 @@ import Control.Monad
 import Data.Array
 
 import qualified Tile as T
+import qualified Random as R
 
 --Caracteristics to be an Item
 class T.TileType a => Item a where  
-
 --Item's Maximum amount of itself that can be stacked in one 
 --slot on any container 
   maxStack  :: a -> Int   
- 
 --Item's Weight			                           
-  weight    :: a -> Int    	 
+  weight    :: a -> Int    	
+  
+-- Items for testing purposes
 
-data Wood = Wood
+data Wood = Wood deriving (Show, Eq)
 instance T.TileType Wood where
   id _     = 1
   name _   = "Wood"
   symbol _ = 'w'
+  spawnCond _ seed (x,y) = R.rollSeed 1 100 (x*y) seed < 50 
 instance Item Wood where
   maxStack _ = 64
   weight _   = 10
