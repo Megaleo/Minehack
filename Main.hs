@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, ConstraintKinds, FlexibleContexts #-}
+{-# LANGUAGE ImpredicativeTypes, ConstraintKinds, FlexibleContexts #-}
 
 module Main where
 
