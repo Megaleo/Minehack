@@ -24,7 +24,7 @@ type Chunk      = Array TileCoord T.Tile
 tileChunk :: TileCoord -> ChunkCoord
 tileChunk (x, y) = (new x, new y)
   where
-    new var = floor $ (toEnum var) / 16 
+    new var = var `div` 16
 
 -- The range of coordinates of a chunk, based on its coordinates
 chunkRange :: ChunkCoord -> (TileCoord, TileCoord)
