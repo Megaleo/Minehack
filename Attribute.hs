@@ -2,9 +2,9 @@ module Attribute where
 -- All the attributes given to a Tile (TileType) by something or someone in-game
 --
 -- #@ Examples @#
--- 
+--
 -- -# Fire Resistance #-
--- @ Gives you resistance to fire 
+-- @ Gives you resistance to fire
 -- @ May be given by a potion
 --
 -- -# Illness #-
@@ -13,7 +13,7 @@ module Attribute where
 --
 -- -# Fatique #-
 -- @ Slows down your moviments and attacks
--- @ May be given by a potion or running without resting/eating 
+-- @ May be given by a potion or running without resting/eating
 
 
 import System.IO
@@ -24,10 +24,10 @@ class (Show a, Eq a) => Attribute a where
 
 --Attribute's unique ID
   id      :: a -> Int
-  
---Attribute's unique name  
+
+--Attribute's unique name
   name    :: a -> String
-  
+
 --Attribute's Effects
 --effects :: [Effect]
 
@@ -35,7 +35,7 @@ class (Show a, Eq a) => Attribute a where
 data DataAttribute = Attribute { aId   :: Int
                                , aName :: String } deriving (Show, Eq)
 
--- Converts an Attribute to a DataAttribute 
+-- Converts an Attribute to a DataAttribute
 attributeData :: Attribute a => a -> DataAttribute
 attributeData attribute = Attribute { aId   = Attribute.id attribute
                                     , aName = name attribute}
@@ -50,4 +50,4 @@ instance Attribute DataAttribute where
 data NoAttributes = NoAttributes deriving (Show, Eq)
 instance Attribute NoAttributes where
   id   _ = -1
-  name _ = "NoAttributes" 
+  name _ = "NoAttributes"

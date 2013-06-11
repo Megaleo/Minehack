@@ -21,11 +21,11 @@ class (Show a, Eq a) => TileType a where
   name      :: a -> String
 -- Condition to Spawn in the world
   spawnCond :: a -> Int -> Coord -> Bool
-  
+
 -- Horrible intances for "spawnCond" function
 instance Show (Int -> Coord -> Bool) where
-  showsPrec _ _ = showString "Função" 
-  
+  showsPrec _ _ = showString "Função"
+
 instance Eq (Int -> Coord -> Bool) where
   _ == _ = True
 
@@ -35,7 +35,7 @@ data DataTileType = TileType { tId        :: Int
                              , tName      :: String
                              , tSpawnCond :: Int -> Coord -> Bool} deriving (Show, Eq)
 
--- Coverts a TileType to a DataTileType 
+-- Coverts a TileType to a DataTileType
 tileTypeData :: TileType a => a -> DataTileType
 tileTypeData tile = TileType { tId        = Tile.id tile
                              , tSymbol    = symbol tile
@@ -47,7 +47,7 @@ instance TileType DataTileType where
   id        (TileType tId _ _ _)        = tId
   symbol    (TileType _ tSymbol _ _)    = tSymbol
   name      (TileType _ _ tName _)      = tName
-  spawnCond (TileType _ _ _ tSpawnCond) = tSpawnCond  
+  spawnCond (TileType _ _ _ tSpawnCond) = tSpawnCond
 
 -- Tile is the representation of each piece in a world, it has a type (Block, Item or Player) and
 -- their own Attributes that specify the aspects of a tile in the world, like the block
@@ -56,4 +56,4 @@ data Tile where
   Tile  :: DataTileType -> [A.DataAttribute] -> Tile
 --Above :: Tile -> Tile -> Tile
   deriving (Show, Eq)
-  
+
