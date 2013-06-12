@@ -17,12 +17,12 @@ import Data.Array
 import qualified Tile as T
 import qualified Random as R
 
---Caracteristics to be an Item
+-- | Characteristics to be an Item.
 class T.TileType a => Item a where
---Item's Maximum amount of itself that can be stacked in one
---slot on any container
+  -- | Item's maximum amount of itself that can be stacked in one
+  -- slot on any container.
   maxStack  :: a -> Int
---Item's Weight
+  -- | Item's weight.
   weight    :: a -> Int
 
 -- Items for testing purposes

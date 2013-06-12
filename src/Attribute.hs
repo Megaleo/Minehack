@@ -22,25 +22,25 @@ import Data.Array
 
 class (Show a, Eq a) => Attribute a where
 
---Attribute's unique ID
+  -- | Attribute's unique ID.
   id      :: a -> Int
 
---Attribute's unique name
+  -- | Attribute's unique name.
   name    :: a -> String
 
---Attribute's Effects
---effects :: [Effect]
+  -- -- | Attribute's effects.
+  --effects :: [Effect]
 
--- Datatype for Attribute class
+-- | Datatype for 'Attribute' class.
 data DataAttribute = Attribute { aId   :: Int
                                , aName :: String } deriving (Show, Eq)
 
--- Converts an Attribute to a DataAttribute
+-- | Converts an Attribute to a DataAttribute.
 attributeData :: Attribute a => a -> DataAttribute
 attributeData attribute = Attribute { aId   = Attribute.id attribute
                                     , aName = name attribute}
 
--- "Converts" a DataAttribute to a Attribute
+-- | \"Converts\" a 'DataAttribute' to a 'Attribute'.
 instance Attribute DataAttribute where
   id   (Attribute aId _)   = aId
   name (Attribute _ aName) = aName

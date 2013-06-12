@@ -10,20 +10,20 @@ import Data.Array
 import qualified Tile as T
 import qualified Random as R
 
--- Caracteristics to be an Block (class or data?)
+-- | Characteristics to be an Block (class or data?).
 class T.TileType a => Block a where
---Block's Visibility
+  -- | Block's visibility.
   seeThrough  :: a -> Bool --seeThrough :: a -> ColorSpectrum -> Bool
---Block's "Walk and stand over" caracteristic (with damage value)
+  -- | Block's "walk and stand over" caracteristic (with damage value).
   walkThrough :: a -> Maybe R.Roll
---Block's Fixed amount of hits to break (Initial damage value)
+  -- | Block's fixed amount of hits to break (initial damage value).
   hitstoBreak :: a -> R.Roll
---Block's Weight
+  -- | Block's weight.
   weight      :: a -> Int -- weight :: a -> a -> Weight
---Block's drop when broken
+  -- | Block's drop when broken.
   drops       :: a -> Maybe [a]
---Block's physical material
---material    :: a -> [Block.RawMaterial]
+  -- -- | Block's physical material.
+  -- material    :: a -> [Block.RawMaterial]
 
 -- Blocks for Testing Purposes
 

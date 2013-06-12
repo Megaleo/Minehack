@@ -1,26 +1,26 @@
-module Random where
-
--- #@TODO@#
+-- | #@TODO@#
 --
--- @Inplement support for other "Num" types in "Roll"
+-- @Implement support for other "Num" types in "Roll".
+module Random where
 
 import System.Random
 import Test.QuickCheck
 
--- Convenient 'roll' dice \ random number generator
+-- | Convenient 'roll' dice \ random number generator.
 rollSeed :: Int -> Int -> Int -> Int -> Int
 rollSeed min max determinant seed = round (toEnum(randomRs (min, (max * 100)) (mkStdGen seed) !! (determinant `mod` 100)) / 100)
 
--- Roll min max seed or Fix number
+-- | Roll min max seed or Fix number.
 data Roll =
     Roll Int Int Int
   | Fix  Int
 
+-- | TODO
 roll :: Roll -> Int
 roll (Roll min max seed) = rollSeed min max (seed `mod` 200) seed
 roll (Fix value)         = value
 
--- Testing for how far it takes to a number repeat in a list
+-- | Testing for how far it takes to a number repeat in a list.
 repPeriod :: Int -> [Int] -> Int
 repPeriod equal list = minimum . diffs . fst . unzip . filter equals $ zip [1..(length list)] list
   where
