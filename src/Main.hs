@@ -4,7 +4,7 @@ module Main where
 
 import UI.NCurses
 import System.IO
-import System.Random 
+import System.Random
 import Control.Monad
 import Test.QuickCheck
 
