@@ -23,10 +23,12 @@ class (Show a, Eq a) => TileType a where
   spawnCond :: a -> Int -> Coord -> Bool
 
 -- Horrible intances for "spawnCond" function
-instance Show (Int -> Coord -> Bool) where
+--
+-- meteficha: *horrible* indeed!
+instance Show (a -> b) where
   showsPrec _ _ = showString "Função"
 
-instance Eq (Int -> Coord -> Bool) where
+instance Eq (a -> b) where
   _ == _ = True
 
 -- Datatype for TileType class
