@@ -12,9 +12,9 @@ rollSeed :: Int -> Int -> Int -> Int -> Int
 rollSeed min max determinant seed = round (toEnum(randomRs (min, (max * 100)) (mkStdGen seed) !! (determinant `mod` 100)) / 100)
 
 -- Roll min max seed or Fix number
-data Roll where
-  Roll :: Int -> Int -> Int -> Roll
-  Fix  :: Int -> Roll
+data Roll =
+    Roll Int Int Int
+  | Fix  Int
 
 roll :: Roll -> Int
 roll (Roll min max seed) = rollSeed min max (seed `mod` 200) seed

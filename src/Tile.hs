@@ -54,8 +54,7 @@ instance TileType DataTileType where
 -- Tile is the representation of each piece in a world, it has a type (Block, Item or Player) and
 -- their own Attributes that specify the aspects of a tile in the world, like the block
 -- damage or the intelligence level of a Player.
-data Tile where
-  Tile  :: DataTileType -> [A.DataAttribute] -> Tile
---Above :: Tile -> Tile -> Tile
+data Tile =
+  Tile DataTileType [A.DataAttribute]
+  -- | Above Tile Tile
   deriving (Show, Eq)
-

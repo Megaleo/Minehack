@@ -74,4 +74,4 @@ executable Minehack
   hs-source-dirs: src/
 
   extensions:
-    GADTs
+    -- no extensions needed =)
