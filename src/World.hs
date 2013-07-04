@@ -4,6 +4,11 @@
 --
 -- This module will care of these world stuff, loading chunks
 -- mainly.
+--
+-- | #@TODO@#
+--
+-- @ Add suport for biomes
+
 module World where
 
 import Data.Array
