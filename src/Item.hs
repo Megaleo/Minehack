@@ -23,25 +23,3 @@ maxStack Wood = 64
 -- | Item's weight in grams per m^3
 weight    :: Item -> Double
 weight Wood = 700
-
-{-
--- | Characteristics to be an Item.
-class T.TileType a => Item a where
-  -- | Item's maximum amount of itself that can be stacked in one
-  -- | slot on any container.
-  maxStack  :: a -> Int
-  -- | Item's weight.
-  weight    :: a -> Int
-
--- Items for testing purposes
-
-data Wood = Wood deriving (Show, Eq)
-instance T.TileType Wood where
-  id _     = 1
-  name _   = "Wood"
-  symbol _ = 'w'
-  spawnCond _ seed (x,y) = R.rollSeed 1 100 (x*y) seed < 50
-instance Item Wood where
-  maxStack _ = 64
-  weight _   = 10
--}
