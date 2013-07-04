@@ -15,11 +15,22 @@ module Attribute where
 -- @ Slows down your moviments and attacks
 -- @ May be given by a potion or running without resting/eating
 
+data Attribute = NoAttributes
+               | Burning
+               deriving (Eq, Enum)  
 
-import System.IO
-import Control.Monad
-import Data.Array
+-- | Attribute's unique name.
+name              :: Attribute -> String
+name NoAttributes = "NoAttributes"
+name Burning      = "Burning"
 
+instance Show Attribute where
+  showsPrec _ = showString . name
+
+-- -- | Attribute's effects.
+--effects :: [Effect]
+
+{-
 class (Show a, Eq a) => Attribute a where
 
   -- | Attribute's unique ID.
@@ -51,3 +62,4 @@ data NoAttributes = NoAttributes deriving (Show, Eq)
 instance Attribute NoAttributes where
   id   _ = -1
   name _ = "NoAttributes"
+-}

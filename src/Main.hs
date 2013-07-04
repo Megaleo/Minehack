@@ -1,20 +1,20 @@
 {-# LANGUAGE ImpredicativeTypes, ConstraintKinds, FlexibleContexts #-}
-
 module Main where
 
-import UI.NCurses
-import System.IO
-import System.Random
-import Control.Monad
-import Test.QuickCheck
+-- import UI.HSCurses.Curses
+-- import System.IO
+-- import Control.Monad
 
-import qualified World as W
-import qualified Tile as T
-import qualified Item as I
-import qualified Block as B
-import qualified Player as P
-import qualified Attribute as A
-import qualified Random as R
+{-
+import World 
+import Tile 
+import Item 
+import Block 
+import Player 
+import Attribute 
+import Random 
+-}
 
-main = do
-  putStrLn "Oi"
+main :: IO()
+main = do	
+	putStrLn "Main working"

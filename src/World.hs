@@ -6,19 +6,17 @@
 -- mainly.
 module World where
 
-import System.IO
-import Control.Monad
 import Data.Array
-import Data.Ix
 
 import qualified Tile as T
 import qualified Attribute as A
 
--- type synonyms
+-- | Type synonyms
 type Coord      = (Int, Int)
 type TileCoord  = Coord
 type ChunkCoord = Coord
-type Chunk      = Array TileCoord T.Tile
+-- | Chunk = Array of Tile's id (TileType and Attributes` id) and its coordenates 
+type Chunk      = Array TileCoord (T.TileType, [A.Attribute])
 
 -- | A chunk is 16x16 'Tile's.
 -- Returns the 'Chunk' coordinates of a 'Tile'.
@@ -29,10 +27,10 @@ tileChunk (x, y) = (new x, new y)
 
 -- | The range of coordinates of a 'Chunk', based on its coordinates.
 chunkRange :: ChunkCoord -> (TileCoord, TileCoord)
-chunkRange (x, y) = ((min x,min y),(max x, max y))
+chunkRange (x, y) = ((min_ x, min_ y),(max_ x, max_ y))
   where
-    min = (*) 16
-    max = (+) 15 . min
+    min_ = (*) 16
+    max_ = (+) 15 . min_
 
 -- | Returns if it is or not in the chunk's range, based of its coordinates.
 isInChunkRange :: TileCoord -> ChunkCoord -> Bool
@@ -46,10 +44,10 @@ generateChunk seed tile chunkC = array rangeC $ generateChunkList seed tile chun
   where
     rangeC = chunkRange chunkC
 
--- | Generates a list of 'Tile's and its coordinates to auxile
+-- | Generates a list of TileType and Attributes, with its coordenates 
 -- 'generateChunk'.
-generateChunkList :: Int -> T.Tile -> ChunkCoord -> [(TileCoord, T.Tile)]
-generateChunkList seed (T.Tile tile attributes) chunkC = [(coord, (T.Tile tile attributes))| coord <- range rangeC, T.spawnCond tile seed coord]
+generateChunkList :: Int -> T.Tile -> ChunkCoord -> [(TileCoord, (T.TileType, [A.Attribute]))]
+generateChunkList seed (T.Tile tile attributes) chunkC = [(coord, (tile, attributes)) | coord <- range rangeC, T.spawnCond tile seed coord]
   where
     rangeC = chunkRange chunkC
 

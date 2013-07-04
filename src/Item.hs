@@ -10,17 +10,25 @@ module Item where
 --
 -- There will be many more other others modules and classes to specify the big "Item" class,
 
-import System.IO
-import Control.Monad
-import Data.Array
+-- import qualified Random as R
 
-import qualified Tile as T
-import qualified Random as R
+data Item = Wood 
+          deriving Eq
 
+-- | Item's maximum amount of itself that can be stacked in one
+-- | slot on any container.
+maxStack      :: Item -> Int
+maxStack Wood = 64 
+
+-- | Item's weight in grams per m^3
+weight    :: Item -> Double
+weight Wood = 700
+
+{-
 -- | Characteristics to be an Item.
 class T.TileType a => Item a where
   -- | Item's maximum amount of itself that can be stacked in one
-  -- slot on any container.
+  -- | slot on any container.
   maxStack  :: a -> Int
   -- | Item's weight.
   weight    :: a -> Int
@@ -36,4 +44,4 @@ instance T.TileType Wood where
 instance Item Wood where
   maxStack _ = 64
   weight _   = 10
-
+-}

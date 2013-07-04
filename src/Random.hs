@@ -8,29 +8,25 @@ import Test.QuickCheck
 
 -- | Convenient 'roll' dice \ random number generator.
 rollSeed :: Int -> Int -> Int -> Int -> Int
-rollSeed min max determinant seed = round (toEnum(randomRs (min, (max * 100)) (mkStdGen seed) !! (determinant `mod` 100)) / 100)
+rollSeed min_ max_ determinant seed = round ((toEnum(randomRs (min_, (max_ * 100)) (mkStdGen seed) !! (determinant `mod` 100)) / 100) :: Double)
 
--- | Roll min max seed or Fix number.
-data Roll =
-    Roll Int Int Int
-  | Fix  Int
+-- | Roll min_ max_ or Fix number.
+data Roll = Roll Int Int
+          | Fix Int
 
 -- | TODO
-roll :: Roll -> Int
-roll (Roll min max seed) = rollSeed min max (seed `mod` 200) seed
-roll (Fix value)         = value
+roll :: Roll -> Int -> Int
+roll (Roll min_ max_) seed = rollSeed min_ max_ (seed `mod` 200) seed
+roll (Fix value) _         = value
 
 -- | Testing for how far it takes to a number repeat in a list.
 repPeriod :: Int -> [Int] -> Int
 repPeriod equal list = minimum . diffs . fst . unzip . filter equals $ zip [1..(length list)] list
   where
     equals (_,a) = a == equal
-    diffs (x:[]) = [999999]
+    diffs (_:[]) = [999999]
     diffs []     = [999999]
     diffs (x:xs) = [abs (head xs - x)] ++ diffs xs
 
-checkPeriod :: Int -> IO()
-checkPeriod min= quickCheck $ \y -> (repPeriod y $ map (\x -> rollSeed 1 100 x 1615665) [1..1000]) > 50
-
-
-
+checkPeriod :: IO()
+checkPeriod = quickCheck $ \y -> (repPeriod y $ map (\x -> rollSeed 1 100 x 1615665) [1..1000]) > 50
