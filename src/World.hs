@@ -8,15 +8,15 @@ module World where
 
 import Data.Array
 
+import qualified World.Perlin as W.P
 import qualified Tile as T
-import qualified Attribute as A
 
 -- | Type synonyms
 type Coord      = (Int, Int)
 type TileCoord  = Coord
 type ChunkCoord = Coord
 -- | Chunk = Array of Tile's id (TileType and Attributes` id) and its coordenates 
-type Chunk      = Array TileCoord (T.TileType, [A.Attribute])
+type Chunk      = Array TileCoord T.Tile
 
 -- | A chunk is 16x16 'Tile's.
 -- Returns the 'Chunk' coordinates of a 'Tile'.
@@ -46,8 +46,8 @@ generateChunk seed tile chunkC = array rangeC $ generateChunkList seed tile chun
 
 -- | Generates a list of TileType and Attributes, with its coordenates 
 -- 'generateChunk'.
-generateChunkList :: Int -> T.Tile -> ChunkCoord -> [(TileCoord, (T.TileType, [A.Attribute]))]
-generateChunkList seed (T.Tile tile attributes) chunkC = [(coord, (tile, attributes)) | coord <- range rangeC, T.spawnCond tile seed coord]
+generateChunkList :: Int -> T.Tile -> ChunkCoord -> [(TileCoord, T.Tile)]
+generateChunkList seed (T.Tile tile attributes) chunkC = [(coord, T.Tile tile attributes) | coord <- range rangeC, T.spawnCond tile seed coord]
   where
     rangeC = chunkRange chunkC
 
