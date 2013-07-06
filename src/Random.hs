@@ -1,6 +1,7 @@
 -- | #@TODO@#
 --
 -- @Implement support for other "Num" types in "Roll".
+
 module Random where
 
 import System.Random

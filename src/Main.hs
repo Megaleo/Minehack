@@ -1,4 +1,3 @@
-{-# LANGUAGE ImpredicativeTypes, ConstraintKinds, FlexibleContexts #-}
 module Main where
 
 -- import UI.HSCurses.Curses
@@ -15,6 +14,6 @@ import Attribute
 import Random 
 -}
 
-main :: IO()
+main :: IO ()
 main = do	
 	putStrLn "Main working"

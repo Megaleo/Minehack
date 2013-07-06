@@ -1,19 +1,20 @@
-module Tile where
 -- "TileType.Flammable"   for flammable tiles
 -- "TileType.Blessedness" for (bless/curse)able tiles
 -- "TileType.Worth"       for valuable tiles
 
+module Tile where
+
 import qualified Attribute as A
 import qualified Block as B
 import qualified Item as I
--- mport qualified Player as P
+-- import qualified Player as P
 import qualified Random as R
 
 type Coord = (Int, Int)
 
 data TileType = TBlock B.Block
               | TItem  I.Item 
-              -- | TPlayer (P.Player a) 
+              -- | TPlayer P.Player
               deriving Eq 
 
  -- | Tile's unique ID.
@@ -22,18 +23,18 @@ id (TBlock B.Air)  = 0
 id (TBlock B.Wood) = 1
 id (TItem I.Wood)  = 2 
 
--- | Converts from an ID, it allows the world information
--- | to be stored with id's, and not from the Tile itself
-fromId   :: Int -> TileType
-fromId 0 = TBlock B.Air
-fromId 1 = TBlock B.Wood
-fromId 2 = TItem I.Wood
-fromId _ = TBlock B.Air
+-- | Converts from an ID, it can allow less 
+-- data storage when saving chunks 
+fromId   :: Int -> Maybe TileType
+fromId 0 = Just $ TBlock B.Air
+fromId 1 = Just $ TBlock B.Wood
+fromId 2 = Just $ TItem I.Wood
+fromId _ = Nothing
 
 -- | Tile's unique symbol.
 symbol                 :: TileType -> Char
 symbol (TBlock B.Air)  = '.'
-symbol (TBlock B.Wood) = 'w'
+symbol (TBlock B.Wood) = 'W'
 symbol (TItem I.Wood)  = 'w'     
 
 -- | Tile's unique name.
@@ -43,7 +44,7 @@ name (TBlock B.Wood) = "Block of Wood"
 name (TItem I.Wood)  = "Item of Wood"
 
 -- | Condition to Spawn in the world.
--- | It takes a TileType, a seed and a tile coordenate.
+-- It takes a TileType, a seed and a tile coordenate.
 spawnCond                            :: TileType -> Int -> Coord -> Bool
 spawnCond (TItem I.Wood) seed (x,y)  = R.rollSeed 1 100 (x*y) seed < 50
 spawnCond (TBlock B.Wood) seed (x,y) = R.rollSeed 1 100 (x*y) seed < 50

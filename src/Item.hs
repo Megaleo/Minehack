@@ -12,11 +12,15 @@ module Item where
 
 -- import qualified Random as R
 
+-- All the Items
 data Item = Wood 
           deriving Eq
 
+-- | All these functions below have to handle every 
+-- single item in the Item declaration 
+
 -- | Item's maximum amount of itself that can be stacked in one
--- | slot on any container.
+-- slot on any container.
 maxStack      :: Item -> Int
 maxStack Wood = 64 
 

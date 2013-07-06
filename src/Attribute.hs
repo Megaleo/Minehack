@@ -15,9 +15,13 @@ module Attribute where
 -- @ Slows down your moviments and attacks
 -- @ May be given by a potion or running without resting/eating
 
+-- All the Attributes
 data Attribute = NoAttributes
                | Burning
                deriving (Eq, Enum)  
+
+-- | All these functions below have to handle every 
+-- single attribute in the Attribute declaration
 
 -- | Attribute's unique name.
 name              :: Attribute -> String
