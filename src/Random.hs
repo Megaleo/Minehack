@@ -1,7 +1,3 @@
--- | #@TODO@#
---
--- @Implement support for other "Num" types in "Roll".
-
 module Random where
 
 import System.Random
@@ -15,7 +11,7 @@ rollSeed min_ max_ determinant seed = round ((toEnum(randomRs (min_, (max_ * 100
 data Roll = Roll Int Int
           | Fix Int
 
--- | TODO
+-- | Takes a Roll type and a Seed to generate a Integer.
 roll :: Roll -> Int -> Int
 roll (Roll min_ max_) seed = rollSeed min_ max_ (seed `mod` 200) seed
 roll (Fix value) _         = value
@@ -29,5 +25,6 @@ repPeriod equal list = minimum . diffs . fst . unzip . filter equals $ zip [1..(
     diffs []     = [999999]
     diffs (x:xs) = [abs (head xs - x)] ++ diffs xs
 
+-- | Checks the period of repetition using repPeriod.
 checkPeriod :: IO()
 checkPeriod = quickCheck $ \y -> (repPeriod y $ map (\x -> rollSeed 1 100 x 1615665) [1..1000]) > 50

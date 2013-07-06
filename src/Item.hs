@@ -1,4 +1,3 @@
-module Item where
 -- "Item.Money" for only money representention items
 --
 -- Here will be all the definitions and functions around the concept of the Item.
@@ -10,20 +9,22 @@ module Item where
 --
 -- There will be many more other others modules and classes to specify the big "Item" class,
 
+module Item where
+
 -- import qualified Random as R
 
--- All the Items
-data Item = Wood 
+-- All the Items:
+data Item = Wood
           deriving Eq
 
--- | All these functions below have to handle every 
--- single item in the Item declaration 
+-- | All these functions below have to handle every
+-- single item in the Item declaration.
 
 -- | Item's maximum amount of itself that can be stacked in one
 -- slot on any container.
-maxStack      :: Item -> Int
-maxStack Wood = 64 
+maxStack :: Item -> Int
+maxStack Wood = 64
 
 -- | Item's weight in grams per m^3
-weight    :: Item -> Double
+weight :: Item -> Double
 weight Wood = 700
