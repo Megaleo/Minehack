@@ -7,7 +7,7 @@
 --
 -- TODO
 --
--- @ Add suport for biomes
+-- @ Add suport for more complex biomes
 
 module World where
 
@@ -17,12 +17,14 @@ import Numeric.Noise
 import Numeric.Noise.Perlin
 
 import qualified Tile as T
+import qualified Block as B
+import qualified Item as I
 
 -- | Type synonyms
 type Coord      = (Int, Int)
 type TileCoord  = Coord
 type ChunkCoord = Coord
--- | Chunk = Array of Tiles and its coordenates 
+-- | Chunk = Array of Tiles and its coordenates
 type Chunk      = Array TileCoord T.Tile
 
 -- | A chunk is 16x16 'Tile's.
@@ -43,7 +45,7 @@ chunkRange (x, y) = ((min_ x, min_ y),(max_ x, max_ y))
 isInChunkRange :: TileCoord -> ChunkCoord -> Bool
 isInChunkRange tileC chunkC = tileChunk tileC == chunkC
 
--- | Generates a 2D map with type Double from a Perlin. 
+-- | Generates a 2D map with type Double from a Perlin.
 twoD             :: Double -> Double -> Perlin -> Double
 twoD x y perlin_ = noiseValue perlin_ (x,y,1)
 
@@ -54,7 +56,38 @@ chunkPMap                    :: Double -> Perlin -> ChunkCoord -> [Int]
 chunkPMap mult perlin_ coord = [round $ mult * (twoD (toEnum x) (toEnum y) perlin_) | (x, y) <- range $ chunkRange coord]
 
 -- | Generates a chunk based on the multiplier, pelin and chunk coordenates for
--- chunkMap and a function that picks a values in the perlin map and returns a
+-- chunkPMap and a function that picks a values in the perlin map and returns a
 -- tile. mapping it, genPerlinChunk generates a chunk
-generateChunk                           :: Double -> Perlin -> ChunkCoord -> (Int -> T.Tile) -> [T.Tile]
-generateChunk mult perlin_ cCoord pFunc = map pFunc $ chunkPMap mult perlin_ cCoord
+genChunk                           :: Double -> Perlin -> ChunkCoord -> (Int -> T.Tile) -> [T.Tile]
+genChunk mult perlin_ cCoord pFunc = map pFunc $ chunkPMap mult perlin_ cCoord
+
+-- | The standart multiplication factor for
+-- CPM and biome generation (CPM stands for
+-- "Chunk Perlin Map").
+stdMult :: Double
+stdMult = 100.0
+
+-- | A simple biome is a function that returns a tile
+-- given a value on the Chunk Perlin Map, some arguments
+-- for Perlin creation and a multiplier.
+data SimpleBiome = SBiome { cpmFunc :: Int -> T.Tile
+                          , perlinArgs :: Int -> Perlin -- Takes a Seed by argument
+                          , multiplier :: Double }
+
+genSBiomeChunk                    :: Int -> ChunkCoord -> SimpleBiome -> [T.Tile]
+genSBiomeChunk seed cCoord sBiome = genChunk mult perlin_ cCoord cpmF
+    where
+        mult    = multiplier sBiome
+        perlin_ = (perlinArgs sBiome) seed
+        cpmF    = cpmFunc sBiome
+
+simpleForest :: SimpleBiome
+simpleForest = SBiome cpmMap perlin_ stdMult
+    where
+        cpmMap value = if value < 0
+                       then T.Tile (T.TBlock B.Air) []
+                       else if value < 10
+                       then T.Tile (T.TItem I.Wood) []
+                       else T.Tile (T.TBlock B.Wood) []
+
+        perlin_ seed = perlin seed 5 0.07 0.05
