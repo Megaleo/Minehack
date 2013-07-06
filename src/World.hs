@@ -55,11 +55,16 @@ twoD x y perlin_ = noiseValue perlin_ (x,y,1)
 chunkPMap                    :: Double -> Perlin -> ChunkCoord -> [Int]
 chunkPMap mult perlin_ coord = [round $ mult * (twoD (toEnum x) (toEnum y) perlin_) | (x, y) <- range $ chunkRange coord]
 
--- | Generates a chunk based on the multiplier, pelin and chunk coordenates for
+-- | Generates a list of tiles based on the multiplier, pelin and chunk coordenates for
 -- chunkPMap and a function that picks a values in the perlin map and returns a
--- tile. mapping it, genPerlinChunk generates a chunk
-genChunk                           :: Double -> Perlin -> ChunkCoord -> (Int -> T.Tile) -> [T.Tile]
-genChunk mult perlin_ cCoord pFunc = map pFunc $ chunkPMap mult perlin_ cCoord
+-- tile. mapping it, genPerlinChunk generates a list of tiles
+genPrimitiveChunk                           :: Double -> Perlin -> ChunkCoord -> (Int -> T.Tile) -> [T.Tile]
+genPrimitiveChunk mult perlin_ cCoord pFunc = map pFunc $ chunkPMap mult perlin_ cCoord
+
+-- | Uses the same technic as in genPrimitiveChunk
+-- but it returns a Chunk (Array of Tiles).
+genChunk                           :: Double -> Perlin -> ChunkCoord -> (Int -> T.Tile) -> Chunk
+genChunk mult perlin_ cCoord pFunc = array (chunkRange cCoord) $ zip (range $ chunkRange cCoord) (genPrimitiveChunk mult perlin_ cCoord pFunc)
 
 -- | The standart multiplication factor for
 -- CPM and biome generation (CPM stands for
@@ -74,13 +79,20 @@ data SimpleBiome = SBiome { cpmFunc :: Int -> T.Tile
                           , perlinArgs :: Int -> Perlin -- Takes a Seed by argument
                           , multiplier :: Double }
 
-genSBiomeChunk                    :: Int -> ChunkCoord -> SimpleBiome -> [T.Tile]
-genSBiomeChunk seed cCoord sBiome = genChunk mult perlin_ cCoord cpmF
+-- | Generates a list of tiles by applying genPrimitiveChunk
+-- handling a SimpleBiome
+genPrimitiveSBiomeChunk                    :: Int -> ChunkCoord -> SimpleBiome -> [T.Tile]
+genPrimitiveSBiomeChunk seed cCoord sBiome = genPrimitiveChunk mult perlin_ cCoord cpmF
     where
         mult    = multiplier sBiome
         perlin_ = (perlinArgs sBiome) seed
         cpmF    = cpmFunc sBiome
 
+genSBiomeChunk                    :: Int -> ChunkCoord -> SimpleBiome -> Chunk
+genSBiomeChunk seed cCoord sBiome = array (chunkRange cCoord) $ zip (range $ chunkRange cCoord) (genPrimitiveSBiomeChunk seed cCoord sBiome)
+
+-- | A Simple Forest made out of "Block of Wood",
+-- "Item of Wood" and "Air"
 simpleForest :: SimpleBiome
 simpleForest = SBiome cpmMap perlin_ stdMult
     where
@@ -89,5 +101,4 @@ simpleForest = SBiome cpmMap perlin_ stdMult
                        else if value < 10
                        then T.Tile (T.TItem I.Wood) []
                        else T.Tile (T.TBlock B.Wood) []
-
         perlin_ seed = perlin seed 5 0.07 0.05
