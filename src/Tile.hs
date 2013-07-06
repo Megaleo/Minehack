@@ -62,3 +62,6 @@ data Tile =
   Tile TileType [A.Attribute]
   -- Above Tile Tile
   deriving (Show, Eq)
+
+tileSymbol :: Tile -> Char
+tileSymbol (Tile tileType _) = symbol tileType
