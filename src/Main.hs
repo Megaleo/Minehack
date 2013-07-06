@@ -14,16 +14,22 @@ import Tile
 -- import Attribute
 -- import Random
 
--- Prints the symbols of a Chunk.
-simpleChunkPrint :: String -> IO ()
-simpleChunkPrint = putStrLn . unlines . sep16
+-- | Prints the symbols of a Chunk.
+simpleSymbolPrint :: String -> IO ()
+simpleSymbolPrint = putStrLn . unlines . sep16
     where
         sep16 [] = []
         sep16 str = (take 16 str) : (sep16 $ drop 16 str)
 
--- Main.
+-- | Prints a Chunk.
+simpleChunkPrint :: Int -> ChunkCoord -> SimpleBiome -> IO ()
+simpleChunkPrint seed cCoord sBiome = simpleSymbolPrint . map tileSymbol . elems $ genSBiomeChunk seed cCoord sBiome
+
+-- | Main.
 main :: IO ()
-main =
+main = do
     putStr "Seed: "
-	>> getLine
-    >>= \x -> simpleChunkPrint . map tileSymbol . elems $ genSBiomeChunk (read x) (0,0) simpleForest
+    seed <- readLn :: IO Int
+    putStr "Chunk Coordenates: "
+    cCoord <- readLn :: IO (Int, Int)
+    simpleChunkPrint seed cCoord simpleForest
