@@ -103,4 +103,4 @@ simpleForest = SBiome cpmMap perlin_ stdMult
                        else if value < 10
                        then T.Tile (T.TItem I.Wood) []
                        else T.Tile (T.TBlock B.Wood) []
-        perlin_ seed = perlin seed 5 0.07 0.05
+        perlin_ seed = perlin seed 5 0.3 0.1

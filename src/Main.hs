@@ -17,19 +17,35 @@ import Tile
 -- | Prints the symbols of a Chunk.
 simpleSymbolPrint :: String -> IO ()
 simpleSymbolPrint = putStrLn . unlines . sep16
-    where
-        sep16 [] = []
-        sep16 str = (take 16 str) : (sep16 $ drop 16 str)
+
+sep16 :: String -> [String]
+sep16 [] = []
+sep16 str = (take 16 str) : (sep16 $ drop 16 str)
+
+vAlign :: [String] -> [String] -> [String]
+vAlign = (++)
+
+hAlign :: [String] -> [String] -> [String]
+hAlign = zipWith (++)
+
+chunkLines :: Int -> ChunkCoord -> SimpleBiome -> [String]
+chunkLines seed cCoord sBiome = sep16 . chunkSymbols $ genSBiomeChunk seed cCoord sBiome
 
 -- | Prints a Chunk.
 simpleChunkPrint :: Int -> ChunkCoord -> SimpleBiome -> IO ()
-simpleChunkPrint seed cCoord sBiome = simpleSymbolPrint . map tileSymbol . elems $ genSBiomeChunk seed cCoord sBiome
+simpleChunkPrint seed cCoord sBiome = simpleSymbolPrint . chunkSymbols $ genSBiomeChunk seed cCoord sBiome
+
+chunkSymbols :: Chunk -> String
+chunkSymbols = map tileSymbol . elems
 
 -- | Main.
 main :: IO ()
 main = do
     putStr "Seed: "
     seed <- readLn :: IO Int
-    putStr "Chunk Coordenates: "
-    cCoord <- readLn :: IO (Int, Int)
-    simpleChunkPrint seed cCoord simpleForest
+    putStr "Center Chunk Coordenates: "
+    (y,x) <- readLn :: IO (Int, Int)
+    putStrLn . unlines $ ((chunkLines seed (x-1,y-1) simpleForest) `hAlign` (chunkLines seed (x-1,y) simpleForest) `hAlign` (chunkLines seed (x-1,y+1) simpleForest)) `vAlign`
+                         ((chunkLines seed (x,y-1) simpleForest)   `hAlign` (chunkLines seed (x,y) simpleForest)   `hAlign` (chunkLines seed (x,y+1) simpleForest))   `vAlign`
+                         ((chunkLines seed (x+1,y-1) simpleForest) `hAlign` (chunkLines seed (x+1,y) simpleForest) `hAlign` (chunkLines seed (x+1,y+1) simpleForest))
+
