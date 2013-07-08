@@ -33,6 +33,3 @@ name Burning      = "Burning"
 -- | Show instance for Attribute
 instance Show Attribute where
   showsPrec _ = showString . name
-
--- -- | Attribute's effects.
---effects :: [Effect]

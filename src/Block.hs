@@ -5,9 +5,9 @@ module Block where
 
 import qualified Random as R
 
--- All the Blocks:
-data Block = Air
-           | Wood
+-- | All the Blocks:
+data Block = Air   -- ^ Air, just air.
+           | Wood  -- ^ Solid block of wood.
            deriving Eq
 
 -- | All these functions below have to handle every
@@ -15,8 +15,8 @@ data Block = Air
 
 -- | Block's visibility.
 seeThrough :: Block -> Bool --seeThrough :: Block -> ColorSpectrum -> Bool
-seeThrough Air   = True
-seeThrough Wood  = False
+seeThrough Air  = True
+seeThrough Wood = False
 
 -- | Block's "walk and stand over" caracteristic (with damage value).
 -- The Maybe is for specification if you can not walk through (Nothing)
@@ -35,14 +35,14 @@ hitstoBreak Wood = Just $ R.Roll 15 20
 -- | Block's weight in grams per m^3
 -- Will be specified the amount of grams per m^3 the player (or anything) can
 -- support. In normal conditions, is 1225 g/m^3, the "weight" of Air.
-weight :: Block -> Double
-weight Air       = 1225.0 -- Source: http://en.wikipedia.org/wiki/Density_of_air
-weight Wood      = 700    -- Source: http://en.wikipedia.org/wiki/Density
+blockWeight :: Block -> Double
+blockWeight Air  = 1225.0 -- Source: http://en.wikipedia.org/wiki/Density_of_air
+blockWeight Wood = 700    -- Source: http://en.wikipedia.org/wiki/Density
 
 -- | Block's drops when broken.
 drops :: Block -> Maybe [Block]
-drops Air       = Nothing
-drops Wood      = Nothing
+drops Air  = Nothing
+drops Wood = Nothing
 
 -- -- | Block's physical material.
 -- material    :: Block -> [Block.RawMaterial]
