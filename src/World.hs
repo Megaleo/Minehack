@@ -28,6 +28,7 @@ type TileCoord  = Coord
 type ChunkCoord = Coord
 -- | Chunk = Array of Tiles and its coordenates.
 type Chunk      = Array TileCoord T.Tile
+type CTile      = (TileCoord, T.Tile)
 
 -- Returns the Chunk coordinates of a Tile.
 tileChunk :: TileCoord -> ChunkCoord
