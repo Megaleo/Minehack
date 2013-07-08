@@ -18,6 +18,7 @@ import Numeric.Noise
 import Numeric.Noise.Perlin
 
 import qualified Tile as T
+import qualified Tile.TileType as TT
 import qualified Block as B
 import qualified Item as I
 
@@ -76,7 +77,7 @@ stdMult = 100.0
 -- given a value on the Chunk Perlin Map, some arguments
 -- for Perlin creation and a multiplier.
 data SimpleBiome = SBiome { cpmFunc :: Int -> T.Tile
-                          , perlinArgs :: Int -> Perlin -- Takes a Seed by argument
+                          , perlinArgs :: Int -> Perlin -- ^ Takes a Seed by argument
                           , multiplier :: Double }
 
 -- | Generates a list of tiles by applying genPrimitiveChunk
@@ -98,9 +99,8 @@ genSBiomeChunk seed cCoord sBiome = array (chunkRange cCoord) $ zip (range $ chu
 simpleForest :: SimpleBiome
 simpleForest = SBiome cpmMap perlin_ stdMult
     where
-        cpmMap value = if value < 0
-                       then T.Tile (T.TBlock B.Air) []
-                       else if value < 10
-                       then T.Tile (T.TItem I.Wood) []
-                       else T.Tile (T.TBlock B.Wood) []
+        cpmMap value
+          | value < 0  = T.Tile (TT.TBlock B.Air) []
+          | value < 10 = T.Tile (TT.TItem I.Wood) []
+          | otherwise  = T.Tile (TT.TBlock B.Wood) []
         perlin_ seed = perlin seed 5 0.3 0.1
