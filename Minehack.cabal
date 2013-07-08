@@ -63,13 +63,17 @@ executable Minehack
     Random
     Tile
     World
+    Saving
+    Entity.Player
+    Entity.Mob
+    Level
 
   -- Other library packages from which modules are imported.
   build-depends: base       >= 4.5    && < 5
                , array      == 0.4.*
                , random     == 1.0.*
                , QuickCheck >= 2.6
-               , ncurses    >= 0.2
+               , hsnoise    >= 0.0.2
 
   hs-source-dirs: src/
 
