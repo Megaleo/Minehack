@@ -23,34 +23,34 @@ data ID = ID Int (Maybe String)
 tileId :: TileType -> ID
 tileId (TBlock B.Air)                     = ID 0 Nothing
 tileId (TBlock B.Wood)                    = ID 1 Nothing
-tileId (TItem I.Wood)                     = ID 1 $ Just "Item"
-tileId (TEntity (E.EPlayer EP.Human))     = ID 2 Nothing
-tileId (TEntity (E.EPlayer (EP.Mob mob))) = ID 2 $ Just $ show $ tileId $ TEntity $ E.EMob mob
-tileId (TEntity (E.EMob EM.Horse))        = ID 3 Nothing
-tileId (TEntity (E.EMob EM.Olimpio))      = ID 4 Nothing
+tileId (TItem I.Wood)                     = ID 2 Nothing
+tileId (TEntity (E.EPlayer EP.Human))     = ID 3 Nothing
+tileId (TEntity (E.EPlayer (EP.Mob mob))) = ID 3 $ Just $ show $ tileId $ TEntity $ E.EMob mob
+tileId (TEntity (E.EMob EM.Horse))        = ID 4 Nothing
+tileId (TEntity (E.EMob EM.Olimpio))      = ID 5 Nothing
 
 -- | Converts from an ID, it can allow less
 -- data storage when saving chunks.
 fromTileId :: ID -> Maybe TileType
 fromTileId (ID 0 Nothing)       = Just $ TBlock B.Air
 fromTileId (ID 1 Nothing)       = Just $ TBlock B.Wood
-fromTileId (ID 1 (Just "Item")) = Just $ TItem I.Wood
-fromTileId (ID 2 Nothing)       = Just $ TEntity $ E.EPlayer EP.Human
-fromTileId (ID 2 (Just mobId))
+fromTileId (ID 2 Nothing = Just $ TItem I.Wood
+fromTileId (ID 3 Nothing)       = Just $ TEntity $ E.EPlayer EP.Human
+fromTileId (ID 3 (Just mobId))
     | fromTileId (read mobId :: ID) == Nothing = Nothing
     | otherwise = Just $ TEntity $ E.EPlayer $ EP.Mob $ returnMob $ fromTileId (read mobId :: ID)
         where
-            -- | Returns the mob of a player from a TileType
+            -- | Returns the mob of a player from a TileType Entity.
             returnMob (Just (TEntity (E.EMob mob))) = mob
             returnMob _                             = error "It is impossible to get here"
-fromTileId (ID 3 Nothing)       = Just $ TEntity $ E.EMob EM.Horse
-fromTileId (ID 4 Nothing)       = Just $ TEntity $ E.EMob EM.Olimpio
+fromTileId (ID 4 Nothing)       = Just $ TEntity $ E.EMob EM.Horse
+fromTileId (ID 5 Nothing)       = Just $ TEntity $ E.EMob EM.Olimpio
 fromTileId _ = Nothing
 
 
 -- | TileType's unique symbol.
 symbol :: TileType -> Char
-symbol (TBlock B.Air)                     = '.'
+symbol (TBlock B.Air)                     = ' '
 symbol (TBlock B.Wood)                    = 'W'
 symbol (TItem I.Wood)                     = 'w'
 symbol (TEntity (E.EPlayer EP.Human))     = '@'
