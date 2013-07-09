@@ -35,5 +35,6 @@ data ActionType = Move             -- ^ Move to a tile
 
 -- | Handles an Action to generate the effects
 onAction :: Action -> ([E.Effect], [E.Effect])
+onAction (Action (coord1, tile1) (Just (coord2, tile2)) _) = undefined
 -- onAction (Action (coord1, tile1) (coord2, tile2) ()) = undefined
 

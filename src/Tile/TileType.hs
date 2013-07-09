@@ -34,7 +34,7 @@ tileId (TEntity (E.EMob EM.Olimpio))      = ID 5 Nothing
 fromTileId :: ID -> Maybe TileType
 fromTileId (ID 0 Nothing)       = Just $ TBlock B.Air
 fromTileId (ID 1 Nothing)       = Just $ TBlock B.Wood
-fromTileId (ID 2 Nothing = Just $ TItem I.Wood
+fromTileId (ID 2 Nothing)       = Just $ TItem I.Wood
 fromTileId (ID 3 Nothing)       = Just $ TEntity $ E.EPlayer EP.Human
 fromTileId (ID 3 (Just mobId))
     | fromTileId (read mobId :: ID) == Nothing = Nothing

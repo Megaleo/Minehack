@@ -26,4 +26,5 @@ data EffectType = ChangeInPosition W.TileCoord  -- ^ Change in position.
                 | ChangeInHP Int                -- ^ Change the HP by an Int.
 
 onEffect :: W.WorldState -> Effect -> W.WorldState
+onEffect (W.World _ _ tiles) (Effect (x,y) _) = undefined
 --onEffect (W.World _ _ tiles) (Effect (x,y) ()) = undefined
