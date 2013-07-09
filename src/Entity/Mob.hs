@@ -7,24 +7,6 @@ data Mob = Horse   -- ^ A Horse
          | Olimpio -- ^ "O Destruidor"
          deriving (Eq, Show)
 
--- | Gender of a mob.
-data MobGender = Masculine | Feminine | Intersex
-               deriving (Eq, Show)
-
--- | All the data about the mob.
--- This will go on its attributes.
-data MobData = MobData
-    { pName         :: Maybe Name    -- ^ Maybe a name with surname.
-    , pAge          :: Maybe Int     -- ^ Maybe am age in years
-    , pGender       :: Maybe Gender  -- ^ Maybe a MobGender
-    , pHp           :: Int           -- ^ Health Points.
-    , pMaxHp        :: Int           -- ^ Maximum HP
-    , pIntelligence :: L.Experience  -- ^ Intelligence.
-    , pStrengh      :: L.Experience  -- ^ Strengh.
-    } deriving (Eq, Show)
-
-
-
 -- | Initial Health Points.
 initHp :: Mob -> Int
 initHp Horse   = 50

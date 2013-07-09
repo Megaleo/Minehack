@@ -16,14 +16,12 @@ data Player = Human      -- ^ Normal Human.
             | Mob M.Mob  -- ^ Some mob.
             deriving (Eq, Show)
 
--- | All the data about the player.
--- This will go on its attributes.
+-- | All the specs about the player.
 data PlayerData = PlayerData
-    { pName         :: Name          -- ^ Name, with surname.
-    , pAge          :: Int           -- ^ Age, in years
-    , pGender       :: Gender        -- ^ Gender
-    , pHp           :: Int           -- ^ Health Points.
-    , pMaxHp        :: Int           -- ^ Maximum HP
-    , pIntelligence :: L.Experience  -- ^ Intelligence.
-    , pStrengh      :: L.Experience  -- ^ Strengh.
+    { pName         :: Name        -- ^ initial Name, with surname.
+    , pAge          :: Int         -- ^ Initial Age, in years
+    , pGender       :: Gender      -- ^ Initial Gender
+    , pHp           :: Int         -- ^ Initial Health Points.
+    , pIntelligence :: L.Experience  -- ^ Initial Intelligence.
+    , pStrengh      :: L.Experience  -- ^ Initial Strengh.
     } deriving (Eq, Show)
