@@ -4,9 +4,9 @@
 --
 -- The scheme from an action to the actual Real effect in the world is:
 --
---            Process Action                              Process the effect updating world to
--- Action --> by the target  ==> ([Effect], [Effect]) --> the new tiles, so when the chunks are
---            response to it         |          |         are being loaded, they load the new tiles
+--            Process Action                             Process the effect updating world to
+-- Action --> by the actor  ==> ([Effect], [Effect]) --> the new tiles, so when the chunks are
+--            response to it         |          |        are being loaded, they load the new tiles
 --                              Effects on      |
 --                                Actor         |
 --                                         Effects on
@@ -15,7 +15,9 @@
 module Action where
 
 import Tile.TileType as TT
-import World as W
+
+import qualified World as W
+import qualified Effect as E
 
 -- | An action in formed by an enity that makes the action
 -- , maybe a target and the type of the action (jump, run, etc.).
@@ -32,5 +34,6 @@ data ActionType = Move             -- ^ Move to a tile
                 deriving (Eq, Show)
 
 -- | Handles an Action to generate the effects
--- onAction :: Action -> ([Effect], [Effect])
--- onAction (Action () () ()) = undefined
+onAction :: Action -> ([E.Effect], [E.Effect])
+-- onAction (Action (coord1, tile1) (coord2, tile2) ()) = undefined
+
