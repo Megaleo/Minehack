@@ -23,33 +23,43 @@ data MobData = MobData
     , mStrengh      :: L.Experience     -- ^ Strengh.
     } deriving (Eq, Show, Read)
 
+-- | Changes the mob's name.
 changeMobName :: MobData -> Maybe String -> MobData
 changeMobName (MobData _ a g h mh i s) name = MobData name a g h mh i s
 
+-- | Changes the mob's age.
 changeMobAge :: MobData -> Maybe Int -> MobData
 changeMobAge (MobData n _ g h mh i s) age = MobData n age g h mh i s
 
+-- | Adds to the mob's age.
 addMobAge :: MobData -> Int -> MobData
 addMobAge (MobData n a g h mh i s) age = MobData n (fmap (+age) a) g h mh i s
 
+-- | Changes the mob's gender.
 changeMobGender :: MobData -> Maybe MobGender -> MobData
 changeMobGender (MobData n a _ h mh i s) gender = MobData n a gender h mh i s
 
+-- | Changes the mob's HP.
 changeMobHp :: MobData -> Int -> MobData
 changeMobHp (MobData n a g _ mh i s) hp = MobData n a g hp mh i s
 
+-- | Adds to the mob's HP.
 addMobHp :: MobData -> Int -> MobData
 addMobHp (MobData n a g h mh i s) hp = MobData n a g (h + hp) mh i s
 
+-- | Changes the mob's Maximum HP.
 changeMobMaxHP :: MobData -> Int -> MobData
 changeMobMaxHP (MobData n a g h _ i s) maxHp = MobData n a g h maxHp i s
 
+-- | Adds to the mob's Maximum HP.
 addMobMaxHP :: MobData -> Int -> MobData
 addMobMaxHP (MobData n a g h mh i s) maxHp = MobData n a g h (mh + maxHp) i s
 
+-- | Changes the mob's intelligence.
 changeMobIntelligence :: MobData -> L.Experience -> MobData
 changeMobIntelligence (MobData n a g h mh _ s) intelligence = MobData n a g h mh intelligence s
 
+-- | Changes the mob's strengh.
 changeMobStrengh :: MobData -> L.Experience -> MobData
 changeMobStrengh (MobData n a g h mh i _) strengh = MobData n a g h mh i strengh
 

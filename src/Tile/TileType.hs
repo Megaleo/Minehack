@@ -16,36 +16,36 @@ data TileType = TBlock B.Block
               deriving Eq
 
 -- A ID is a Number a meta-string
-data ID = ID Int (Maybe String)
+data ID = ID Int String
         deriving (Eq, Show, Read)
 
 -- | TileType's unique ID.
-tileId :: TileType -> ID
-tileId (TBlock B.Air)                     = ID 0 Nothing
-tileId (TBlock B.Wood)                    = ID 1 Nothing
-tileId (TItem I.Wood)                     = ID 2 Nothing
-tileId (TEntity (E.EPlayer EP.Human))     = ID 3 Nothing
-tileId (TEntity (E.EPlayer (EP.Mob mob))) = ID 3 $ Just $ show $ tileId $ TEntity $ E.EMob mob
-tileId (TEntity (E.EMob EM.Horse))        = ID 4 Nothing
-tileId (TEntity (E.EMob EM.Olimpio))      = ID 5 Nothing
+tileID :: TileType -> ID
+tileID (TBlock B.Air)                     = ID 0 ""
+tileID (TBlock B.Wood)                    = ID 1 ""
+tileID (TItem I.Wood)                     = ID 2 ""
+tileID (TEntity (E.EPlayer EP.Human))     = ID 3 ""
+tileID (TEntity (E.EPlayer (EP.Mob mob))) = ID 3 $ show $ tileID $ TEntity $ E.EMob mob
+tileID (TEntity (E.EMob EM.Horse))        = ID 4 ""
+tileID (TEntity (E.EMob EM.Olimpio))      = ID 5 ""
 
 -- | Converts from an ID, it can allow less
 -- data storage when saving chunks.
-fromTileId :: ID -> Maybe TileType
-fromTileId (ID 0 Nothing)       = Just $ TBlock B.Air
-fromTileId (ID 1 Nothing)       = Just $ TBlock B.Wood
-fromTileId (ID 2 Nothing)       = Just $ TItem I.Wood
-fromTileId (ID 3 Nothing)       = Just $ TEntity $ E.EPlayer EP.Human
-fromTileId (ID 3 (Just mobId))
-    | fromTileId (read mobId :: ID) == Nothing = Nothing
-    | otherwise = Just $ TEntity $ E.EPlayer $ EP.Mob $ returnMob $ fromTileId (read mobId :: ID)
+fromTileID :: ID -> Maybe TileType
+fromTileID (ID 0 _)       = Just $ TBlock B.Air
+fromTileID (ID 1 _)       = Just $ TBlock B.Wood
+fromTileID (ID 2 _)       = Just $ TItem I.Wood
+fromTileID (ID 3 "")       = Just $ TEntity $ E.EPlayer EP.Human
+fromTileID (ID 3 mobId)
+    | fromTileID (read mobId :: ID) == Nothing = Nothing
+    | otherwise = Just $ TEntity $ E.EPlayer $ EP.Mob $ returnMob $ fromTileID (read mobId :: ID)
         where
             -- | Returns the mob of a player from a TileType Entity.
             returnMob (Just (TEntity (E.EMob mob))) = mob
             returnMob _                             = error "It is impossible to get here"
-fromTileId (ID 4 Nothing)       = Just $ TEntity $ E.EMob EM.Horse
-fromTileId (ID 5 Nothing)       = Just $ TEntity $ E.EMob EM.Olimpio
-fromTileId _ = Nothing
+fromTileID (ID 4 _)       = Just $ TEntity $ E.EMob EM.Horse
+fromTileID (ID 5 _)       = Just $ TEntity $ E.EMob EM.Olimpio
+fromTileID _ = Nothing
 
 
 -- | TileType's unique symbol.
@@ -80,6 +80,11 @@ weight (TEntity (E.EPlayer EP.Human))     = 70000.0
 weight (TEntity (E.EPlayer (EP.Mob mob))) = weight $ TEntity $ E.EMob mob
 weight (TEntity (E.EMob EM.Horse))        = 400.0 -- Source: http://en.wikipedia.org/wiki/Horse
 weight (TEntity (E.EMob EM.Olimpio))      = 1 / 0
+
+damageAsWeapon :: TileType -> Int
+damageAsWeapon (TBlock B.Wood) = -100 -- ^ A Block of Wood is heavy!
+damageAsWeapon (TItem I.Wood)  = -10
+damageAsWeapon _               = 0
 
 -- | Show instance for TileType
 instance Show TileType where

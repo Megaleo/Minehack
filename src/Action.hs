@@ -14,10 +14,12 @@
 
 module Action where
 
-import Tile.TileType as TT
-
+import qualified Tile.TileType as TT
+import qualified Tile as T
 import qualified World as W
 import qualified Effect as E
+import qualified Block as B
+import qualified Item as I
 
 -- | An action in formed by an enity that makes the action
 -- , maybe a target and the type of the action (jump, run, etc.).
@@ -29,12 +31,51 @@ data Action = Action
     , actionType :: ActionType  -- ^ The type of the action.
     } deriving (Eq, Show)
 
-data ActionType = Move             -- ^ Move to a tile
-                | Hit TT.TileType  -- ^ Hit a target with some TileType
+data ActionType = Move             -- ^ Move to a tile.
+                | Hit T.Tile       -- ^ Hit a target with some Tile.
                 deriving (Eq, Show)
 
--- | Handles an Action to generate the effects
-onAction :: Action -> ([E.Effect], [E.Effect])
-onAction (Action (coord1, tile1) (Just (coord2, tile2)) _) = undefined
--- onAction (Action (coord1, tile1) (coord2, tile2) ()) = undefined
+-- | Function to calculate the damage of a hit with some
+-- weapon on both tiles. It returns the damage to the
+-- attacker and to the target.
+-- In the future, the damage will be affected by the
+-- enchantment on the tile used as weapon and by
+-- the skill of the attacker
+onHit :: W.CTile -> W.CTile -> T.Tile -> (Int, Int)
+onHit _ _ (T.Tile tile _)  = (0, TT.damageAsWeapon tile)
+onHit a t (T.Above t1 t2)  = (0, (snd $ onHit a t t1) + (snd $ onHit a t t2))
+onHit a t (T.Inside t1 t2) = (0, (snd $ onHit a t t1) + (snd $ onHit a t t2))
+onHit a t (T.Tiles t1 t2)  = (0, (snd $ onHit a t t1) + (snd $ onHit a t t2))
 
+-- | Handles an Action to generate the effects
+-- WARNING : This function will be big, very big.
+onAction :: Action -> ([E.Effect], [E.Effect])
+onAction (Action a (Just t@(c2, (T.Tile (TT.TItem I.Wood) _))) Move) = ([E.Effect a (E.OccupySameSpace c2)], [E.Effect t (E.NoEffect)])
+onAction (Action a (Just t@(c2, (T.Tile (TT.TBlock b) _))) Move)     = if B.stayInside b
+                                                                       then ([E.Effect a (E.ChangeInPositionInside c2)], [E.Effect t (E.NoEffect)])
+                                                                       else ([E.Effect a (E.Sprawl t)], [E.Effect t (E.Sprawled a)])
+onAction (Action a (Just t@(_, (T.Tile (TT.TEntity _) _))) Move)     = ([E.Effect a (E.Sprawl t)], [E.Effect t (E.Sprawled a)])
+onAction (Action a (Just t@(c, (T.Above t1 _))) Move)                = (fst primAction, map (E.Effect t) $ map (E.effectType) $ snd primAction)
+    where
+        primAction = onAction $ Action a (Just (c,t1)) Move
+onAction (Action a (Just t@(c, (T.Inside t1 _))) Move)               = (fst primAction, map (E.Effect t) $ map (E.effectType) $ snd primAction)
+    where
+        primAction = onAction $ Action a (Just (c,t1)) Move
+onAction (Action a (Just t@(c, (T.Tiles t1 _))) Move)                = (fst primAction, map (E.Effect t) $ map (E.effectType) $ snd primAction)
+    where
+        primAction = onAction $ Action a (Just (c,t1)) Move
+onAction (Action a Nothing Move)                                     = ([E.Effect a (E.NoEffect)],[])
+
+onAction (Action a (Just t@(_, (T.Tile _ _))) (Hit w))               = ([E.Effect a (E.ChangeInHP $ fst $ onHit a t w)], [E.Effect a (E.ChangeInHP $ snd $ onHit a t w)])
+onAction (Action a (Just t@(c, (T.Above t1 _))) (Hit w))             = (fst primAction, map (E.Effect t) $ map (E.effectType) $ snd primAction)
+    where
+        primAction = onAction $ Action a (Just (c,t1)) (Hit w)
+onAction (Action a (Just t@(c, (T.Inside t1 _))) (Hit w))            = (fst primAction, map (E.Effect t) $ map (E.effectType) $ snd primAction)
+    where
+        primAction = onAction $ Action a (Just (c,t1)) (Hit w)
+onAction (Action a (Just t@(c, (T.Tiles t1 _))) (Hit w))             = (fst primAction, map (E.Effect t) $ map (E.effectType) $ snd primAction)
+    where
+        primAction = onAction $ Action a (Just (c,t1)) (Hit w)
+onAction (Action a Nothing (Hit _))                                  = ([E.Effect a (E.NoEffect)],[])
+
+-- onAction (Action (coord1, tile1) (coord2, tile2) ()) = undefined

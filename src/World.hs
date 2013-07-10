@@ -13,6 +13,7 @@
 module World where
 
 import Data.Array
+import Data.List
 
 import Numeric.Noise
 import Numeric.Noise.Perlin
@@ -123,6 +124,7 @@ simplePlain = SBiome cpmMap perlin_ stdMult
 -- | A WorldState is made of a Seed, a Name of the World
 -- and a list of modified tiles and its coordinates.
 data WorldState = World Seed String [CTile]
+                deriving (Eq, Show)
 
 -- | Loads a Chunk from the chunk coordinates, a simple biome for
 -- the chunk and the world state.
@@ -160,6 +162,55 @@ loadSBiomeMChunk (x,y) sBiomeM wState@(World seed _ _) = loadSBiomeChunk (x,y) s
 loadChunk :: ChunkCoord -> WorldState -> Chunk
 loadChunk cCoord wState = loadSBiomeMChunk cCoord stdBiomeMap wState
 
--- | Tile made of wood, for testing purposes.
-woodTile :: T.Tile
-woodTile = T.Tile (TT.TBlock B.Wood) []
+-- | Loads a Tile by the World State.
+loadTile :: TileCoord -> WorldState -> CTile
+loadTile c (World seed _ tiles) = case lookup c tiles of
+                                      Just t  -> (c,t)
+                                      Nothing -> (c, (cpmFunc ((cpmFuncM stdBiomeMap) value1) value2))
+                                                  where
+                                                      sBiome = (cpmFuncM stdBiomeMap) value1
+                                                      value1 = fromEnum $ (multiplierM stdBiomeMap) * (twoD (toEnum $ fst $ tileChunk c) (toEnum $ snd $ tileChunk c) ((perlinArgsM stdBiomeMap) seed))
+                                                      value2 = fromEnum $ (multiplier sBiome) * (twoD (toEnum $ fst c) (toEnum $ snd c) ((perlinArgs sBiome) seed))
+
+-- | Tile made of a block of wood, for testing purposes.
+blockWoodTile :: T.Tile
+blockWoodTile = T.Tile (TT.TBlock B.Wood) []
+
+-- | Tile made of a item of wood, for testing purposes.
+itemWoodTile :: T.Tile
+itemWoodTile = T.Tile (TT.TItem I.Wood) []
+
+-- | Tile made of air, for testing purposes.
+airTile :: T.Tile
+airTile = T.Tile (TT.TBlock B.Air) []
+
+-- | Verifies if an CTile exist in an WorldState.
+existInTiles :: CTile -> WorldState -> Bool
+existInTiles ctile (World _ _ tiles) = ctile `elem` tiles
+
+-- | Returns the CTile if it
+-- exists in the WorldState.
+returnTile :: CTile -> WorldState -> Maybe CTile
+returnTile ctile ws = if existInTiles ctile ws
+                          then Just ctile
+                          else Nothing
+
+-- | If a tile is already modified in the World State, then
+-- it replaces with the new tile, if not, then it just put
+-- the new tile in the World State.
+changeTile :: WorldState -> CTile -> WorldState
+changeTile (World s str tiles) (c, tile) = case lookup c tiles of
+                                               Just t  -> World s str $ (c,tile) : delete (c,t) tiles
+                                               Nothing -> World s str $ (c,tile) : tiles
+
+-- | Deletes an CTile from a list.
+-- If it is of type 'Tiles', 'Above'
+-- or 'Inside', then it deletes the
+-- first tile, remaining the second.
+deleteTile :: CTile -> [CTile] -> [CTile]
+deleteTile (c, t) tiles = case lookup c tiles of
+                              Just (T.Above _ t2)  -> (c, t2) : delete (c, t) tiles
+                              Just (T.Inside _ t2) -> (c, t2) : delete (c, t) tiles
+                              Just (T.Tiles _ t2)  -> (c, t2) : delete (c, t) tiles
+                              Just _               -> delete (c, t) tiles
+                              Nothing              -> tiles

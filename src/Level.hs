@@ -2,12 +2,12 @@ module Level where
 
 -- | Experience points.
 newtype Experience = Experience Int
-                   deriving (Eq, Show)
+                   deriving (Eq, Show, Read)
 
 -- | Levels are calculated from experience points
 -- using the function toLevel.
 newtype Level = Level Int
-              deriving (Eq, Show)
+              deriving (Eq, Show, Read)
 
 -- | The calculation for the Level.
 -- Basically, is log base 2.

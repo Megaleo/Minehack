@@ -25,6 +25,11 @@ walkThrough :: Block -> Maybe R.Roll
 walkThrough Air  = Just $ R.Fix 0
 walkThrough Wood = Just $ R.Roll 1 2
 
+-- | If something can stay inside of a block.
+stayInside :: Block -> Bool
+stayInside Air  = True
+stayInside Wood = False
+
 -- | Block's amount of hits to break it (initial damage value).
 -- If its "Nothing", then the block is indestructible or it can't
 -- be broken, like Air.
