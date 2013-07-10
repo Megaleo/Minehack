@@ -28,3 +28,12 @@ repPeriod equal list = minimum . diffs . fst . unzip . filter equals $ zip [1..(
 -- | Checks the period of repetition using repPeriod.
 checkPeriod :: IO()
 checkPeriod = quickCheck $ \y -> (repPeriod y $ map (\x -> rollSeed 1 100 x 1615665) [1..1000]) > 50
+
+-- | Data type to choose one
+-- element from a list.
+data OneOf a = OneOf [a]
+
+-- | Choses one element from an 'OneOf' list
+-- by a pseudo-random generator, with seed.
+randomOneOf :: Int -> OneOf a -> a
+randomOneOf seed (OneOf list) = list !! (roll (Roll 0 (length list - 1)) seed)
