@@ -2,6 +2,7 @@ module Entity.Player where
 
 import qualified Level as L
 import qualified Entity.Mob as M
+import qualified Random as R
 
 -- | A Name, with surname.
 data Name = Name String String
@@ -10,6 +11,11 @@ data Name = Name String String
 -- | Gender of a player.
 data Gender = Masculine | Feminine | Intersex
             deriving (Eq, Show, Read)
+
+convertGender :: M.MobGender -> Gender
+convertGender (M.Masculine) = Masculine
+convertGender (M.Feminine)  = Feminine
+convertGender (M.Intersex)  = Intersex
 
 -- | What a Player can be:
 data Player = Human      -- ^ Normal Human.
@@ -25,9 +31,9 @@ initPlayerData Human = PlayerData { pName         = Name "Wallace" "Ferner"
                                   , pIntelligence = fst . L.toExpBound $ L.Level 1
                                   , pStrengh      = fst . L.toExpBound $ L.Level 1
                                   }
-initPlayerData (Mob mob) = PlayerData { pName         = Name (show mob) "McMonster"
+initPlayerData (Mob mob) = PlayerData { pName         = Name (fst . R.randomOneOf 1 $ M.mNameGender $ M.initMobData mob) "McMonster"
                                       , pAge          = 0
-                                      , pGender       = Intersex
+                                      , pGender       = convertGender . snd . R.randomOneOf 1 $ M.mNameGender $ M.initMobData mob
                                       , pHp           = 100
                                       , pMaxHp        = 100
                                       , pIntelligence = fst . L.toExpBound $ L.Level 1
