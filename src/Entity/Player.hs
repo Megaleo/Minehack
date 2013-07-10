@@ -5,23 +5,72 @@ import qualified Entity.Mob as M
 
 -- | A Name, with surname.
 data Name = Name String String
-          deriving (Eq, Show)
+          deriving (Eq, Show, Read)
 
 -- | Gender of a player.
-data Gender = Masculine | Feminine
-            deriving (Eq, Show)
+data Gender = Masculine | Feminine | Intersex
+            deriving (Eq, Show, Read)
 
 -- | What a Player can be:
 data Player = Human      -- ^ Normal Human.
             | Mob M.Mob  -- ^ Some mob.
             deriving (Eq, Show)
 
+initPlayerData :: Player -> PlayerData
+initPlayerData Human = PlayerData { pName         = Name "Wallace" "Ferner"
+                                  , pAge          = 25
+                                  , pGender       = Masculine
+                                  , pHp           = 100
+                                  , pMaxHp        = 100
+                                  , pIntelligence = fst . L.toExpBound $ L.Level 1
+                                  , pStrengh      = fst . L.toExpBound $ L.Level 1
+                                  }
+initPlayerData (Mob mob) = PlayerData { pName         = Name (show mob) "McMonster"
+                                      , pAge          = 0
+                                      , pGender       = Intersex
+                                      , pHp           = 100
+                                      , pMaxHp        = 100
+                                      , pIntelligence = fst . L.toExpBound $ L.Level 1
+                                      , pStrengh      = fst . L.toExpBound $ L.Level 1
+                                      }
+
 -- | All the specs about the player.
 data PlayerData = PlayerData
-    { pName         :: Name        -- ^ initial Name, with surname.
-    , pAge          :: Int         -- ^ Initial Age, in years
-    , pGender       :: Gender      -- ^ Initial Gender
-    , pHp           :: Int         -- ^ Initial Health Points.
-    , pIntelligence :: L.Experience  -- ^ Initial Intelligence.
-    , pStrengh      :: L.Experience  -- ^ Initial Strengh.
-    } deriving (Eq, Show)
+    { pName         :: Name          -- ^ Name, with surname.
+    , pAge          :: Int           -- ^ Age, in years
+    , pGender       :: Gender        -- ^ Gender
+    , pHp           :: Int           -- ^ Health Points.
+    , pMaxHp        :: Int           -- ^ Maximum HP
+    , pIntelligence :: L.Experience  -- ^ Intelligence.
+    , pStrengh      :: L.Experience  -- ^ Strengh.
+    } deriving (Eq, Show, Read)
+
+changePlayerName :: PlayerData -> Name -> PlayerData
+changePlayerName (PlayerData _ a g h mh i s) name = PlayerData name a g h mh i s
+
+changePlayerAge :: PlayerData -> Int -> PlayerData
+changePlayerAge (PlayerData n _ g h mh i s) age = PlayerData n age g h mh i s
+
+addPlayerAge :: PlayerData -> Int -> PlayerData
+addPlayerAge (PlayerData n a g h mh i s) age = PlayerData n (a + age) g h mh i s
+
+changePlayerGender :: PlayerData -> Gender -> PlayerData
+changePlayerGender (PlayerData n a _ h mh i s) gender = PlayerData n a gender h mh i s
+
+changePlayerHp :: PlayerData -> Int -> PlayerData
+changePlayerHp (PlayerData n a g _ mh i s) hp = PlayerData n a g hp mh i s
+
+addPlayerHp :: PlayerData -> Int -> PlayerData
+addPlayerHp (PlayerData n a g h mh i s) hp = PlayerData n a g (h + hp) mh i s
+
+changePlayerMaxHP :: PlayerData -> Int -> PlayerData
+changePlayerMaxHP (PlayerData n a g h _ i s) maxHp = PlayerData n a g h maxHp i s
+
+addPlayerMaxHP :: PlayerData -> Int -> PlayerData
+addPlayerMaxHP (PlayerData n a g h mh i s) maxHp = PlayerData n a g h (mh + maxHp) i s
+
+changePlayerIntelligence :: PlayerData -> L.Experience -> PlayerData
+changePlayerIntelligence (PlayerData n a g h mh _ s) intelligence = PlayerData n a g h mh intelligence s
+
+changePlayerStrengh :: PlayerData -> L.Experience -> PlayerData
+changePlayerStrengh (PlayerData n a g h mh i _) strengh = PlayerData n a g h mh i strengh
