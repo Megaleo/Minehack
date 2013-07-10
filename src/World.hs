@@ -124,7 +124,7 @@ simplePlain = SBiome cpmMap perlin_ stdMult
 -- | A WorldState is made of a Seed, a Name of the World
 -- and a list of modified tiles and its coordinates.
 data WorldState = World Seed String [CTile]
-                deriving (Eq, Show)
+                deriving (Eq, Show, Read)
 
 -- | Loads a Chunk from the chunk coordinates, a simple biome for
 -- the chunk and the world state.

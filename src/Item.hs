@@ -15,7 +15,7 @@ module Item where
 
 -- All the Items:
 data Item = Wood
-          deriving Eq
+          deriving (Eq, Show, Read)
 
 -- | All these functions below have to handle every
 -- single item in the Item declaration.

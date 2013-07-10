@@ -20,7 +20,7 @@ convertGender (M.Intersex)  = Intersex
 -- | What a Player can be:
 data Player = Human      -- ^ Normal Human.
             | Mob M.Mob  -- ^ Some mob.
-            deriving (Eq, Show)
+            deriving (Eq, Show, Read)
 
 initPlayerData :: Player -> PlayerData
 initPlayerData Human = PlayerData { pName         = Name "Wallace" "Ferner"

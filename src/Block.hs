@@ -8,7 +8,7 @@ import qualified Random as R
 -- | All the Blocks:
 data Block = Air   -- ^ Air, just air.
            | Wood  -- ^ Solid block of wood.
-           deriving Eq
+           deriving (Eq, Show, Read)
 
 -- | All these functions below have to handle every
 -- single blockin the Block declaration.

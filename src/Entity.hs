@@ -8,4 +8,4 @@ import qualified Entity.Mob as M
 
 data Entity = EPlayer P.Player  -- ^ A player (User).
             | EMob M.Mob        -- ^ A Mob, peaceful or not.
-            deriving (Eq, Show)
+            deriving (Eq, Show, Read)

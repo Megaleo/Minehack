@@ -13,7 +13,7 @@ import qualified Entity.Mob as EM
 data TileType = TBlock B.Block
               | TItem  I.Item
               | TEntity E.Entity
-              deriving Eq
+              deriving (Eq, Show, Read)
 
 -- A ID is a Number a meta-string
 data ID = ID Int String
@@ -85,7 +85,3 @@ damageAsWeapon :: TileType -> Int
 damageAsWeapon (TBlock B.Wood) = -100 -- ^ A Block of Wood is heavy!
 damageAsWeapon (TItem I.Wood)  = -10
 damageAsWeapon _               = 0
-
--- | Show instance for TileType
-instance Show TileType where
-  showsPrec _ = showString . name

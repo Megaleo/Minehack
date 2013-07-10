@@ -25,7 +25,7 @@ data Attribute = NoAttributes
                | Broke
                | PData EP.PlayerData
                | MData EM.MobData
-               deriving (Eq, Show)
+               deriving (Eq, Show, Read)
 
 -- | Returns the ID of an Attribute, if it has an
 -- an argument, then it is returned in the meta-string.

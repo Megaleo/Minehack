@@ -11,7 +11,7 @@ data Tile = Tile TT.TileType [A.Attribute]
           | Inside Tile Tile
           | Above Tile Tile
           | Tiles Tile Tile
-  deriving (Show, Eq)
+  deriving (Show, Eq, Read)
 
 -- Adds an attribute to an attribute, if it is
 -- of 'Inside', 'Above' or 'Tiles' type, then

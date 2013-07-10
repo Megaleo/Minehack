@@ -6,7 +6,7 @@ import qualified Random as R
 -- | All the Mobs:
 data Mob = Horse   -- ^ A Horse
          | Olimpio -- ^ "O Destruidor"
-         deriving (Eq, Show)
+         deriving (Eq, Show, Read)
 
 -- | Gender of a mob.
 data MobGender = Masculine | Feminine | Intersex
