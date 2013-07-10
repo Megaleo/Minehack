@@ -32,8 +32,11 @@ checkPeriod = quickCheck $ \y -> (repPeriod y $ map (\x -> rollSeed 1 100 x 1615
 -- | Data type to choose one
 -- element from a list.
 data OneOf a = OneOf [a]
+             | Elem a
+             deriving (Eq, Show, Read)
 
 -- | Choses one element from an 'OneOf' list
 -- by a pseudo-random generator, with seed.
 randomOneOf :: Int -> OneOf a -> a
 randomOneOf seed (OneOf list) = list !! (roll (Roll 0 (length list - 1)) seed)
+randomOneOf _ (Elem a)         = a
