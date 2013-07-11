@@ -172,18 +172,6 @@ loadTile c (World seed _ tiles) = case lookup c tiles of
                                                       value1 = fromEnum $ (multiplierM stdBiomeMap) * (twoD (toEnum $ fst $ tileChunk c) (toEnum $ snd $ tileChunk c) ((perlinArgsM stdBiomeMap) seed))
                                                       value2 = fromEnum $ (multiplier sBiome) * (twoD (toEnum $ fst c) (toEnum $ snd c) ((perlinArgs sBiome) seed))
 
--- | Tile made of a block of wood, for testing purposes.
-blockWoodTile :: T.Tile
-blockWoodTile = T.Tile (TT.TBlock B.Wood) []
-
--- | Tile made of a item of wood, for testing purposes.
-itemWoodTile :: T.Tile
-itemWoodTile = T.Tile (TT.TItem I.Wood) []
-
--- | Tile made of air, for testing purposes.
-airTile :: T.Tile
-airTile = T.Tile (TT.TBlock B.Air) []
-
 -- | Verifies if an CTile exist in an WorldState.
 existInTiles :: CTile -> WorldState -> Bool
 existInTiles ctile (World _ _ tiles) = ctile `elem` tiles

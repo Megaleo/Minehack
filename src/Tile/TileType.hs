@@ -50,7 +50,7 @@ fromTileID _ = Nothing
 
 -- | TileType's unique symbol.
 symbol :: TileType -> Char
-symbol (TBlock B.Air)                     = ' '
+symbol (TBlock B.Air)                     = '.'
 symbol (TBlock B.Wood)                    = 'W'
 symbol (TItem I.Wood)                     = 'w'
 symbol (TEntity (E.EPlayer EP.Human))     = '@'
@@ -81,7 +81,34 @@ weight (TEntity (E.EPlayer (EP.Mob mob))) = weight $ TEntity $ E.EMob mob
 weight (TEntity (E.EMob EM.Horse))        = 400.0 -- Source: http://en.wikipedia.org/wiki/Horse
 weight (TEntity (E.EMob EM.Olimpio))      = 1 / 0
 
+-- | Returns the damage point a TileType
+-- will cause if it is used as a weapon.
 damageAsWeapon :: TileType -> Int
 damageAsWeapon (TBlock B.Wood) = -100 -- ^ A Block of Wood is heavy!
 damageAsWeapon (TItem I.Wood)  = -10
 damageAsWeapon _               = 0
+
+-- | Returns if a TileType is an Entity
+isOnlyEntity :: TileType -> Bool
+isOnlyEntity (TEntity _) = True
+isOnlyEntity _           = False
+
+-- | Returns if a TileType is a Mob
+isOnlyMob :: TileType -> Bool
+isOnlyMob (TEntity (E.EMob _)) = True
+isOnlyMob _                    = False
+
+-- | Returns if a TileType is a Player
+isOnlyPlayer :: TileType -> Bool
+isOnlyPlayer (TEntity (E.EPlayer _)) = True
+isOnlyPlayer _                       = False
+
+-- | Returns if a TileType is a Block
+isOnlyBlock :: TileType -> Bool
+isOnlyBlock (TBlock _) = True
+isOnlyBlock _          = False
+
+-- | Returns if a TileType is an Item
+isOnlyItem :: TileType -> Bool
+isOnlyItem (TItem _) = True
+isOnlyItem _         = False
