@@ -32,6 +32,18 @@ type Chunk      = Array TileCoord T.Tile
 -- | A tuple of a tile and its coordinates.
 type CTile      = (TileCoord, T.Tile)
 
+(|+|) :: Coord -> Coord -> Coord
+(x1,y1) |+| (x2,y2) = (x1 + x2, y1 + y2)
+
+(|-|) :: Coord -> Coord -> Coord
+(x1,y1) |-| (x2,y2) = (x1 - x2, y1 - y2)
+
+(|*|) :: Coord -> Int -> Coord
+(x1,y1) |*| m = (x1 * m, y1 * m)
+
+(|/|) :: Coord -> Int -> Coord
+(x1,y1) |/| d = (x1 `div` d, y1 `div` d)
+
 -- Returns the Chunk coordinates of a Tile.
 tileChunk :: TileCoord -> ChunkCoord
 tileChunk (x, y) = (new x, new y)
