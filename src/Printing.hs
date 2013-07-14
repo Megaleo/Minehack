@@ -71,7 +71,7 @@ tileSurface tile                          = tileSurface $ T.mainTile tile
 -- | Prints the image of the world given the world state, the upper left
 -- coordinates of the screen and the surface of the screen.
 printCornerImage :: W.WorldState -> W.Coord -> (T.Tile -> IO SDL.Surface) -> SDL.Surface -> IO ()
-printCornerImage ws (x, y) tileFunc screen = SDL.withInit [SDL.InitEverything] $ do
+printCornerImage ws (x, y) tileFunc screen = do
     Rect _ _ sTWidth sTHeight <- getClipRect screen
     let sWidth  = sTWidth `div` 16 -- ^ divides the width by 16 to get it in terms of tiles
     let sHeight = sTHeight `div` 16 -- ^ divides the height by 16 to get it in terms of tiles
