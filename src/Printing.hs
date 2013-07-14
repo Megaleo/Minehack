@@ -45,12 +45,22 @@ printCorner ws (x, y) (sWidth, sHeight) = do
 
 {- GRAPHICAL PART -}
 
+type TileDimension = W.Coord
+
 -- | Utility function to blit surfaces.
 applySurface :: Int -> Int -> Surface -> Surface -> Maybe Rect -> IO Bool
 applySurface x y src dst clip = blitSurface src clip dst offset
  where offset = Just Rect { rectX = x, rectY = y, rectW = 0, rectH = 0 }
 
--- | Returns the surface of a given Tile
+-- | Returns the surface of a given Tile in 32x32
+tileSurface32 :: T.Tile -> IO SDL.Surface
+tileSurface32 (T.Tile (TT.TBlock B.Wood) _) = SDLi.load "textures/32x32/log_oak.png"
+tileSurface32 (T.Tile (TT.TItem I.Wood) _)  = SDLi.load "textures/32x32/planks_oak.png"
+tileSurface32 (T.Tile (TT.TBlock B.Air) _)  = SDLi.load "textures/32x32/air.png"
+tileSurface32 (T.Tile (TT.TEntity _) _)     = SDLi.load "textures/32x32/human.png"
+tileSurface32 tile                          = tileSurface $ T.mainTile tile
+
+-- | Returns the surface of a given Tile in 16x16
 tileSurface :: T.Tile -> IO SDL.Surface
 tileSurface (T.Tile (TT.TBlock B.Wood) _) = SDLi.load "textures/log_oak.png"
 tileSurface (T.Tile (TT.TItem I.Wood) _)  = SDLi.load "textures/planks_oak.png"
@@ -60,8 +70,8 @@ tileSurface tile                          = tileSurface $ T.mainTile tile
 
 -- | Prints the image of the world given the world state, the upper left
 -- coordinates of the screen and the surface of the screen.
-printCornerImage :: W.WorldState -> W.Coord -> SDL.Surface -> IO ()
-printCornerImage ws (x, y) screen = SDL.withInit [SDL.InitEverything] $ do
+printCornerImage :: W.WorldState -> W.Coord -> (T.Tile -> IO SDL.Surface) -> SDL.Surface -> IO ()
+printCornerImage ws (x, y) tileFunc screen = SDL.withInit [SDL.InitEverything] $ do
     Rect _ _ sTWidth sTHeight <- getClipRect screen
     let sWidth  = sTWidth `div` 16 -- ^ divides the width by 16 to get it in terms of tiles
     let sHeight = sTHeight `div` 16 -- ^ divides the height by 16 to get it in terms of tiles
@@ -70,14 +80,16 @@ printCornerImage ws (x, y) screen = SDL.withInit [SDL.InitEverything] $ do
     let coords  = [(a,b) | a <- [y..(height+y)], b <- [x..(width+x)]] -- ^ All the coordinates
     let cTiles  = map (\c -> W.loadTile c ws) coords -- ^ loads all the tiles that will be displayed
     let cTilesWOffset = map (coordDiff (x,y)) cTiles -- ^ Tiles with its coordinates as offsets to the upper left corner.
-    surfaces <- mapM (tileSurface . snd) cTilesWOffset -- ^ The surfaces of all tiles
+    surfaces <- mapM (tileFunc . snd) cTilesWOffset -- ^ The surfaces of all tiles
     mapM_  (showSTile screen) $ zip (map fst cTilesWOffset) surfaces -- ^ Maps the showSTile to the surfaces with its offsets
     SDL.flip screen -- ^ Flips the screen
         where
             -- I know that mix 'let' and 'where' expressions is not good. -.- --
             -- With the surface, it multiplies all the offsets by a quality factor and
             -- uses 'applySurface' to blit to the source surface.
-            showSTile src ((a,b),surface) = applySurface (a*16) (b*16) surface src Nothing
+            showSTile src ((a,b),surface) = do
+                Rect _ _ w h <- getClipRect surface
+                applySurface (a*w) (b*h) surface src Nothing
             coordDiff (x1,y1) ((x2,y2),tile) = (((x2-x1), (y2-y1)),tile) -- ^ The difference betwen two coordinates
 
 -- | Loop that quits itself if an 'Exit'
