@@ -75,3 +75,14 @@ getInput = do
         SDL.KeyDown (SDL.Keysym (SDL.SDLK_ESCAPE) _ _) -> return Nothing
         SDL.Quit                                       -> return Nothing
         _                                              -> getInput
+
+-- | Returns a new WorldState, depending on the user's action.
+inputAction :: WorldState -> TileCoord -> IO (Maybe WorldState)
+inputAction ws@(World s n _) coord = do
+    input <- getInput
+    case input of
+        Nothing -> return Nothing
+        Just i -> do
+            let action = handleInput ws coord i
+            let effects = A.onAction action
+            return $ Just $ World s n $ foldl1 union $ map wsTiles $ map (E.onEffect ws) effects

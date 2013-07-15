@@ -214,3 +214,6 @@ deleteTile (c, t) tiles = case lookup c tiles of
                               Just (T.Tiles _ t2)  -> (c, t2) : delete (c, t) tiles
                               Just _               -> delete (c, t) tiles
                               Nothing              -> tiles
+
+wsTiles :: WorldState -> [CTile]
+wsTiles (World _ _ tiles) = tiles
