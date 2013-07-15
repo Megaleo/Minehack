@@ -4,48 +4,35 @@ module Main where
 -- import System.IO
 -- import Control.Monad
 
-import Data.Array
+import Graphics.UI.SDL
 
 import World
 import Tile
+import Printing
+import Input
 -- import Item
 -- import Block
 -- import Player
 -- import Attribute
 -- import Random
 
--- | Prints the symbols of a Chunk.
-simpleSymbolPrint :: String -> IO ()
-simpleSymbolPrint = putStrLn . unlines . sep16
+mainLoop :: WorldState -> Coord -> Surface -> IO ()
+mainLoop wState corner screen = do
+    printCornerImage wState corner tileSurface screen
+    maybeNewWorld <- inputAction wState $ fst $ findPlayer wState
+    case maybeNewWorld of
+        Nothing       -> quit
+        Just newWorld -> mainLoop newWorld (findCorner (60,60) $ fst $ findPlayer wState) screen
 
-sep16 :: String -> [String]
-sep16 [] = []
-sep16 str = (take 16 str) : (sep16 $ drop 16 str)
-
-vAlign :: [String] -> [String] -> [String]
-vAlign = (++)
-
-hAlign :: [String] -> [String] -> [String]
-hAlign = zipWith (++)
-
-chunkLines :: Int -> ChunkCoord -> SimpleBiome -> [String]
-chunkLines seed cCoord sBiome = sep16 . chunkSymbols $ genSBiomeChunk seed cCoord sBiome
-
--- | Prints a Chunk.
-simpleChunkPrint :: Int -> ChunkCoord -> SimpleBiome -> IO ()
-simpleChunkPrint seed cCoord sBiome = simpleSymbolPrint . chunkSymbols $ genSBiomeChunk seed cCoord sBiome
-
-chunkSymbols :: Chunk -> String
-chunkSymbols = map tileSymbol . elems
-
--- | Main.
 main :: IO ()
-main = do
+main = withInit [InitEverything] $ do
+    screen <- setVideoMode 960 960 32 [SWSurface]
     putStr "Seed: "
     seed <- readLn :: IO Int
-    putStr "Center Chunk Coordenates: "
-    (y,x) <- readLn :: IO (Int, Int)
-    putStrLn . unlines $ ((chunkLines seed (x-1,y-1) simpleForest) `hAlign` (chunkLines seed (x-1,y) simpleForest) `hAlign` (chunkLines seed (x-1,y+1) simpleForest)) `vAlign`
-                         ((chunkLines seed (x,y-1) simpleForest)   `hAlign` (chunkLines seed (x,y) simpleForest)   `hAlign` (chunkLines seed (x,y+1) simpleForest))   `vAlign`
-                         ((chunkLines seed (x+1,y-1) simpleForest) `hAlign` (chunkLines seed (x+1,y) simpleForest) `hAlign` (chunkLines seed (x+1,y+1) simpleForest))
-
+    putStr "Player's coordinates: "
+    pCoord <- readLn :: IO Coord
+    putStr "Name: "
+    pName <- getLine
+    setCaption (show seed ++ ": " ++ pName) []
+    let corner = findCorner (60,60) pCoord
+    mainLoop (World seed pName [(pCoord, humanTile)]) corner screen

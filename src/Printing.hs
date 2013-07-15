@@ -105,4 +105,3 @@ quitLoop = do
                     Quit    -> return True
                     NoEvent -> return False
                     _       -> whileEvents
-
