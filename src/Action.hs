@@ -31,8 +31,8 @@ data Action = Action
     , actionType :: ActionType  -- ^ The type of the action.
     } deriving (Eq, Show)
 
-data ActionType = Move             -- ^ Move to a tile.
-                | Hit T.Tile       -- ^ Hit a target with some Tile.
+data ActionType = Move        -- ^ Move to a tile.
+                | Hit T.Tile  -- ^ Hit a target with some Tile.
                 deriving (Eq, Show)
 
 -- | Function to calculate the damage of a hit with some
@@ -65,5 +65,4 @@ onAction (Action a (Just (c, (T.Above t1 _))) (Hit w))             = onAction $ 
 onAction (Action a (Just (c, (T.Inside t1 _))) (Hit w))            = onAction $ Action a (Just (c,t1)) (Hit w)
 onAction (Action a (Just (c, (T.Tiles t1 _))) (Hit w))             = onAction $ Action a (Just (c,t1)) (Hit w)
 onAction (Action a Nothing (Hit _))                                = [E.Effect a (E.NoEffect)]
-
 -- onAction (Action (coord1, tile1) (coord2, tile2) ()) = undefined

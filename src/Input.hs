@@ -41,7 +41,7 @@ handleInput ws c MoveDown  = A.Action (loadTile c ws) (Just $ loadTile (c |+| (0
 handleInput ws c MoveLeft  = A.Action (loadTile c ws) (Just $ loadTile (c |-| (1, 0)) ws) A.Move
 handleInput ws c MoveRight = A.Action (loadTile c ws) (Just $ loadTile (c |+| (1, 0)) ws) A.Move
 
--- | Gets an input via 'pollEvent'
+-- | Gets an input via 'pollEvent'.
 getInput :: IO (Maybe Input)
 getInput = do
     event <- SDL.pollEvent
@@ -54,7 +54,6 @@ getInput = do
         SDL.KeyDown (SDL.Keysym (SDL.SDLK_ESCAPE) _ _) -> return Nothing
         SDL.Quit                                       -> return Nothing
         _                                              -> getInput
-
 
 
 

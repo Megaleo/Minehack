@@ -39,6 +39,9 @@ mapAttribute fAttr (Above t1 t2)  = Above (mapAttribute fAttr t1) (mapAttribute 
 mapAttribute fAttr (Inside t1 t2)  = Inside (mapAttribute fAttr t1) (mapAttribute fAttr t2)
 mapAttribute fAttr (Tiles t1 t2)  = Tiles (mapAttribute fAttr t1) (mapAttribute fAttr t2)
 
+noAttributes :: Tile -> Tile
+noAttributes = mapAttribute (\_ -> [])
+
 -- | Tile made of a block of wood, for testing purposes.
 blockWoodTile :: Tile
 blockWoodTile = Tile (TT.TBlock B.Wood) []
