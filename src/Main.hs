@@ -5,6 +5,7 @@ module Main where
 -- import Control.Monad
 
 import Graphics.UI.SDL
+import Data.Array
 
 import World
 import Tile
@@ -16,17 +17,29 @@ import Input
 -- import Attribute
 -- import Random
 
-mainLoop :: WorldState -> Coord -> Surface -> IO ()
-mainLoop wState corner screen = do
-    printCornerImage wState corner tileSurface screen
+screenX, screenY :: Int
+screenX = 60
+screenY = 40
+
+mainASCIIloop :: WorldState -> Coord -> IO ()
+mainASCIIloop ws corner = do
+    printCorner ws corner (screenX,screenY)
+    maybeNewWorld <- inputAction ws $ fst $ findPlayer ws
+    case maybeNewWorld of
+        Nothing       -> quit
+        Just newWorld -> mainASCIIloop newWorld (findCorner (screenX,screenY) $ fst $ findPlayer newWorld)
+
+mainLoop :: WorldState -> Coord -> Surface -> Array TileCoord Tile -> IO ()
+mainLoop wState corner screen lTiles = do
+    newlTiles <- printCornerImage wState lTiles corner tileSurface screen
     maybeNewWorld <- inputAction wState $ fst $ findPlayer wState
     case maybeNewWorld of
         Nothing       -> quit
-        Just newWorld -> mainLoop newWorld (findCorner (60,60) $ fst $ findPlayer wState) screen
+        Just newWorld -> mainLoop newWorld (findCorner (screenX,screenY) $ fst $ findPlayer newWorld) screen newlTiles
 
 main :: IO ()
 main = withInit [InitEverything] $ do
-    screen <- setVideoMode 960 960 32 [SWSurface]
+    screen <- setVideoMode (screenX * 16) (screenY * 16) 32 [SWSurface]
     putStr "Seed: "
     seed <- readLn :: IO Int
     putStr "Player's coordinates: "
@@ -34,5 +47,9 @@ main = withInit [InitEverything] $ do
     putStr "Name: "
     pName <- getLine
     setCaption (show seed ++ ": " ++ pName) []
-    let corner = findCorner (60,60) pCoord
-    mainLoop (World seed pName [(pCoord, humanTile)]) corner screen
+    let corner = findCorner (screenX,screenY) pCoord
+    let (x,y)  = corner
+    let coords = [(a,b) | a <- [y..(59+y)], b <- [x..(39+x)]]
+    let wState = World seed pName [(pCoord, humanTile)]
+    let cTiles = map (\c -> loadTile c wState) coords
+    mainLoop wState corner screen (array (fst $ head cTiles, fst $ last cTiles) cTiles)
