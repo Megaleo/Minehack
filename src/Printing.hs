@@ -4,6 +4,7 @@ import System.Console.ANSI (clearScreen)
 import Graphics.UI.SDL as SDL
 import Graphics.UI.SDL.Image as SDLi
 import Control.Monad
+import Data.Array
 
 import qualified Tile as T
 import qualified World as W
@@ -40,7 +41,7 @@ printCorner ws (x, y) (sWidth, sHeight) = do
         height    = sHeight - 1
         width     = sWidth - 1
         sep16 []  = []
-        sep16 str = "#" ++ (take 60 str) ++ "#\n" ++ (sep16 $ drop 60 str)
+        sep16 str = "#" ++ (take sWidth str) ++ "#\n" ++ (sep16 $ drop sWidth str)
 
 
 {- GRAPHICAL PART -}
@@ -70,19 +71,20 @@ tileSurface tile                          = tileSurface $ T.mainTile tile
 
 -- | Prints the image of the world given the world state, the upper left
 -- coordinates of the screen and the surface of the screen.
-printCornerImage :: W.WorldState -> W.Coord -> (T.Tile -> IO SDL.Surface) -> SDL.Surface -> IO ()
-printCornerImage ws (x, y) tileFunc screen = do
+printCornerImage :: W.WorldState -> Array W.TileCoord T.Tile -> W.Coord -> (T.Tile -> IO SDL.Surface) -> SDL.Surface -> IO (Array W.TileCoord T.Tile)
+printCornerImage ws lTiles (x, y) tileFunc screen = do
     Rect _ _ sTWidth sTHeight <- getClipRect screen
     let sWidth  = sTWidth `div` 16 -- ^ divides the width by 16 to get it in terms of tiles
     let sHeight = sTHeight `div` 16 -- ^ divides the height by 16 to get it in terms of tiles
     let height  = sHeight - 1
     let width   = sWidth - 1
-    let coords  = [(a,b) | a <- [y..(height+y)], b <- [x..(width+x)]] -- ^ All the coordinates
-    let cTiles  = map (\c -> W.loadTile c ws) coords -- ^ loads all the tiles that will be displayed
+    let coords  = [(b,a) | a <- [y..(height+y)], b <- [x..(width+x)]] -- ^ All the coordinates
+    let cTiles  = map (\c -> W.loadEfficientTile c ws lTiles) coords -- ^ loads all the tiles that will be displayed
     let cTilesWOffset = map (coordDiff (x,y)) cTiles -- ^ Tiles with its coordinates as offsets to the upper left corner.
     surfaces <- mapM (tileFunc . snd) cTilesWOffset -- ^ The surfaces of all tiles
     mapM_  (showSTile screen) $ zip (map fst cTilesWOffset) surfaces -- ^ Maps the showSTile to the surfaces with its offsets
     SDL.flip screen -- ^ Flips the screen
+    return $ array (fst $ head cTiles, fst $ last cTiles) cTiles
         where
             -- I know that mix 'let' and 'where' expressions is not good. -.- --
             -- With the surface, it multiplies all the offsets by a quality factor and

@@ -184,6 +184,20 @@ loadTile c (World seed _ tiles) = case lookup c tiles of
                                                       value1 = fromEnum $ (multiplierM stdBiomeMap) * (twoD (toEnum $ fst $ tileChunk c) (toEnum $ snd $ tileChunk c) ((perlinArgsM stdBiomeMap) seed))
                                                       value2 = fromEnum $ (multiplier sBiome) * (twoD (toEnum $ fst c) (toEnum $ snd c) ((perlinArgs sBiome) seed))
 
+forceLoadTile :: TileCoord -> Int -> CTile
+forceLoadTile c seed = (c, (cpmFunc ((cpmFuncM stdBiomeMap) value1) value2))
+                           where
+                               sBiome = (cpmFuncM stdBiomeMap) value1
+                               value1 = fromEnum $ (multiplierM stdBiomeMap) * (twoD (toEnum $ fst $ tileChunk c) (toEnum $ snd $ tileChunk c) ((perlinArgsM stdBiomeMap) seed))
+                               value2 = fromEnum $ (multiplier sBiome) * (twoD (toEnum $ fst c) (toEnum $ snd c) ((perlinArgs sBiome) seed))
+
+loadEfficientTile :: TileCoord -> WorldState -> Array TileCoord T.Tile -> CTile
+loadEfficientTile c (World seed _ tiles) lTiles = case lookup c tiles of
+                                                      Just t  -> (c,t)
+                                                      Nothing -> if inRange (bounds lTiles) c
+                                                                 then (c, lTiles ! c)
+                                                                 else forceLoadTile c seed
+
 -- | Verifies if an CTile exist in an WorldState.
 existInTiles :: CTile -> WorldState -> Bool
 existInTiles ctile (World _ _ tiles) = ctile `elem` tiles
