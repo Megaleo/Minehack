@@ -28,6 +28,9 @@ tileID (TEntity (E.EPlayer EP.Human))     = ID 3 ""
 tileID (TEntity (E.EPlayer (EP.Mob mob))) = ID 3 $ show $ tileID $ TEntity $ E.EMob mob
 tileID (TEntity (E.EMob EM.Horse))        = ID 4 ""
 tileID (TEntity (E.EMob EM.Olimpio))      = ID 5 ""
+tileID (TBlock B.Water)                   = ID 6 ""
+tileID (TBlock B.DeepWater)               = ID 7 ""
+tileID (TBlock B.Sand)                    = ID 8 ""
 
 -- | Converts from an ID, it can allow less
 -- data storage when saving chunks.
@@ -35,7 +38,7 @@ fromTileID :: ID -> Maybe TileType
 fromTileID (ID 0 _)       = Just $ TBlock B.Air
 fromTileID (ID 1 _)       = Just $ TBlock B.Wood
 fromTileID (ID 2 _)       = Just $ TItem I.Wood
-fromTileID (ID 3 "")       = Just $ TEntity $ E.EPlayer EP.Human
+fromTileID (ID 3 "")      = Just $ TEntity $ E.EPlayer EP.Human
 fromTileID (ID 3 mobId)
     | fromTileID (read mobId :: ID) == Nothing = Nothing
     | otherwise = Just $ TEntity $ E.EPlayer $ EP.Mob $ returnMob $ fromTileID (read mobId :: ID)
@@ -46,6 +49,9 @@ fromTileID (ID 3 mobId)
 fromTileID (ID 4 _)       = Just $ TEntity $ E.EMob EM.Horse
 fromTileID (ID 5 _)       = Just $ TEntity $ E.EMob EM.Olimpio
 fromTileID _ = Nothing
+fromTileID (ID 6 _)       = Just $ TBlock B.Water
+fromTileID (ID 7 _)       = Just $ TBlock B.DeepWater
+fromTileID (ID 8 _)       = Just $ TBlock B.Sand
 
 
 -- | TileType's unique symbol.
@@ -57,6 +63,9 @@ symbol (TEntity (E.EPlayer EP.Human))     = '@'
 symbol (TEntity (E.EPlayer (EP.Mob mob))) = symbol $ TEntity $ E.EMob mob
 symbol (TEntity (E.EMob EM.Horse))        = 'u'
 symbol (TEntity (E.EMob EM.Olimpio))      = 'O'
+symbol (TBlock B.Water)                   = '='
+symbol (TBlock B.DeepWater)               = '~'
+symbol (TBlock B.Sand)                    = '_'
 
 -- | TileType's unique name.
 name :: TileType -> String
@@ -67,6 +76,9 @@ name (TEntity (E.EPlayer EP.Human))     = "Human"
 name (TEntity (E.EPlayer (EP.Mob mob))) = name $ TEntity $ E.EMob mob
 name (TEntity (E.EMob EM.Horse))        = "Horse"
 name (TEntity (E.EMob EM.Olimpio))      = "O Destruidor"
+name (TBlock B.Water)                   = "Water"
+name (TBlock B.DeepWater)               = "Deep Water"
+name (TBlock B.Sand)                    = "Sand"
 
 -- | (Initial) Weight of a TileType, in grams:
 -- In case of a Block, is measured in g/m^3.
@@ -80,6 +92,9 @@ weight (TEntity (E.EPlayer EP.Human))     = 70000.0
 weight (TEntity (E.EPlayer (EP.Mob mob))) = weight $ TEntity $ E.EMob mob
 weight (TEntity (E.EMob EM.Horse))        = 400.0 -- Source: http://en.wikipedia.org/wiki/Horse
 weight (TEntity (E.EMob EM.Olimpio))      = 1 / 0
+weight (TBlock B.Water)                   = 1000000.0 -- Source: http://en.wikipedia.org/wiki/Water
+weight (TBlock B.DeepWater)               = B.blockWeight B.Water
+weight (TBlock B.Sand)                    = 2330.0    -- Source: http://en.wikipedia.org/wiki/Density
 
 -- | Returns the damage point a TileType
 -- will cause if it is used as a weapon.

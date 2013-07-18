@@ -133,6 +133,16 @@ simplePlain = SBiome cpmMap perlin_ stdMult
           | otherwise  = T.Tile (TT.TBlock B.Wood) []
         perlin_ seed = perlin seed 5 0.3 0.1
 
+simpleOcean :: SimpleBiome
+simpleOcean = SBiome cpmMap perlin_ stdMult
+    where
+        cpmMap value
+          | value < 50 = T.Tile (TT.TBlock B.DeepWater) []
+          | value < 60 = T.Tile (TT.TBlock B.Water) []
+          | value < 85 = T.Tile (TT.TBlock B.Sand) []
+          | otherwise  = T.Tile (TT.TBlock B.Air) []
+        perlin_ seed = perlin seed 5 0.2 0.01
+
 -- | A WorldState is made of a Seed, a Name of the World
 -- and a list of modified tiles and its coordinates.
 data WorldState = World Seed String [CTile]
@@ -156,8 +166,9 @@ stdBiomeMap :: SimpleBiomeMap
 stdBiomeMap = SBiomeM cpmFM perlin_M stdMult
     where
         cpmFM value
-          | value < 0 = simpleForest
-          | otherwise = simplePlain
+          | value < 0  = simpleForest
+          | value < 50 = simplePlain
+          | otherwise  = simpleOcean
         perlin_M seed = perlin seed 5 0.01 0.001
 
 -- | Loads a chunk from the chunk coordinates, a Simple Biome

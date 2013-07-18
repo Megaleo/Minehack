@@ -63,11 +63,14 @@ tileSurface32 tile                          = tileSurface $ T.mainTile tile
 
 -- | Returns the surface of a given Tile in 16x16
 tileSurface :: T.Tile -> IO SDL.Surface
-tileSurface (T.Tile (TT.TBlock B.Wood) _) = SDLi.load "textures/log_oak.png"
-tileSurface (T.Tile (TT.TItem I.Wood) _)  = SDLi.load "textures/planks_oak.png"
-tileSurface (T.Tile (TT.TBlock B.Air) _)  = SDLi.load "textures/air.png"
-tileSurface (T.Tile (TT.TEntity _) _)     = SDLi.load "textures/human.png"
-tileSurface tile                          = tileSurface $ T.mainTile tile
+tileSurface (T.Tile (TT.TBlock B.Wood) _)      = SDLi.load "textures/log_oak.png"
+tileSurface (T.Tile (TT.TItem I.Wood) _)       = SDLi.load "textures/planks_oak.png"
+tileSurface (T.Tile (TT.TBlock B.Air) _)       = SDLi.load "textures/air.png"
+tileSurface (T.Tile (TT.TEntity _) _)          = SDLi.load "textures/human.png"
+tileSurface (T.Tile (TT.TBlock B.Sand) _)      = SDLi.load "textures/Sand.png"
+tileSurface (T.Tile (TT.TBlock B.Water) _)     = SDLi.load "textures/water.png"
+tileSurface (T.Tile (TT.TBlock B.DeepWater) _) = SDLi.load "textures/water_deep.png"
+tileSurface tile                               = tileSurface $ T.mainTile tile
 
 -- | Prints the image of the world given the world state, the upper left
 -- coordinates of the screen and the surface of the screen.
