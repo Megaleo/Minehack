@@ -31,9 +31,19 @@ data Action = Action
     , actionType :: ActionType  -- ^ The type of the action.
     } deriving (Eq, Show)
 
-data ActionType = Move        -- ^ Move to a tile.
-                | Hit T.Tile  -- ^ Hit a target with some Tile.
+data ActionType = Move                -- ^ Move to a tile.
+                | Hit (Maybe T.Tile)  -- ^ Hit a target with maybe some Tile.
                 deriving (Eq, Show)
+
+{-
+-- | If the first Tile press a key to move to the
+-- second tile, this function returns the action
+-- that will be made, according to the situation.
+onMovement :: W.CTile -> W.CTile -> Action
+onMovement actorT targetT = if T.isTileMob $ snd targetT
+                            then Action actorT targetT (Hit $ weaponEquipped actorT)
+                            else Action actorT targetT Move
+-}
 
 -- | Function to calculate the damage of a hit with some
 -- weapon on both tiles. It returns the damage to the
@@ -41,11 +51,12 @@ data ActionType = Move        -- ^ Move to a tile.
 -- In the future, the damage will be affected by the
 -- enchantment on the tile used as weapon and by
 -- the skill of the attacker
-onHit :: W.CTile -> W.CTile -> T.Tile -> (Int, Int)
-onHit _ _ (T.Tile tile _)  = (0, TT.damageAsWeapon tile)
-onHit a t (T.Above t1 t2)  = (0, (snd $ onHit a t t1) + (snd $ onHit a t t2))
-onHit a t (T.Inside t1 t2) = (0, (snd $ onHit a t t1) + (snd $ onHit a t t2))
-onHit a t (T.Tiles t1 t2)  = (0, (snd $ onHit a t t1) + (snd $ onHit a t t2))
+onHit :: W.CTile -> W.CTile -> (Maybe T.Tile) -> (Int, Int)
+onHit _ _ (Just (T.Tile tile _))  = (0, TT.damageAsWeapon tile)
+onHit a t (Just (T.Above t1 t2))  = (0, (snd $ onHit a t (Just t1)) + (snd $ onHit a t (Just t2)))
+onHit a t (Just (T.Inside t1 t2)) = (0, (snd $ onHit a t (Just t1)) + (snd $ onHit a t (Just t2)))
+onHit a t (Just (T.Tiles t1 t2))  = (0, (snd $ onHit a t (Just t1)) + (snd $ onHit a t (Just t2)))
+onHit _ _ Nothing                 = (0,1)
 
 -- | Handles an Action to generate the effects
 -- WARNING : This function will be big, very big.
