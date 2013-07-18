@@ -39,7 +39,6 @@ mainLoop wState corner screen lTiles = do
 
 main :: IO ()
 main = withInit [InitEverything] $ do
-    screen <- setVideoMode (screenX * 16) (screenY * 16) 32 [SWSurface]
     putStr "Seed: "
     seed <- readLn :: IO Int
     putStr "Player's coordinates: "
@@ -49,7 +48,8 @@ main = withInit [InitEverything] $ do
     setCaption (show seed ++ ": " ++ pName) []
     let corner = findCorner (screenX,screenY) pCoord
     let (x,y)  = corner
-    let coords = [(a,b) | a <- [y..(59+y)], b <- [x..(39+x)]]
+    let coords = [(a,b) | a <- [y..((screenX - 1)+y)], b <- [x..((screenY - 1)+x)]]
     let wState = World seed pName [(pCoord, humanTile)]
     let cTiles = map (\c -> loadTile c wState) coords
+    screen <- setVideoMode (screenX * 16) (screenY * 16) 32 [SWSurface]
     mainLoop wState corner screen (array (fst $ head cTiles, fst $ last cTiles) cTiles)
