@@ -18,8 +18,8 @@ import Input
 -- import Random
 
 screenX, screenY :: Int
-screenX = 40
-screenY = 30
+screenX = 80
+screenY = 60
 
 mainASCIIloop :: WorldState -> Coord -> IO ()
 mainASCIIloop ws corner = do
@@ -29,14 +29,17 @@ mainASCIIloop ws corner = do
         Nothing       -> quit
         Just newWorld -> mainASCIIloop newWorld (findCorner (screenX,screenY) $ fst $ findPlayer newWorld)
 
-mainLoop :: WorldState -> Coord -> Surface -> Array TileCoord Tile -> IO ()
-mainLoop wState corner screen lTiles = do
-    newlTiles <- printCornerImage wState lTiles corner tileSurface screen
-    mapM_ (putStrLn . show) (assocs newlTiles)
+mainLoop :: WorldState -> Coord -> Surface -> IO ()
+mainLoop wState (x, y) screen = do
+    let height  = screenY - 1
+    let width   = screenX - 1
+    let coords  = [(b,a) | a <- [y..(height+y)], b <- [x..(width+x)]] -- ^ All the coordinates
+    let cTiles = map (Prelude.flip loadTile wState) coords
+    printImage (array (fst $ head cTiles, fst $ last cTiles) cTiles) tileSurface screen
     maybeNewWorld <- inputAction wState $ fst $ findPlayer wState
     case maybeNewWorld of
         Nothing       -> quit
-        Just newWorld -> mainLoop newWorld (findCorner (screenX,screenY) $ fst $ findPlayer newWorld) screen newlTiles
+        Just newWorld -> mainLoop newWorld (findCorner (screenX,screenY) $ fst $ findPlayer newWorld) screen
 
 main :: IO ()
 main = withInit [InitEverything] $ do
@@ -48,9 +51,6 @@ main = withInit [InitEverything] $ do
     pName <- getLine
     setCaption (show seed ++ ": " ++ pName) []
     let corner = findCorner (screenX,screenY) pCoord
-    let (x,y)  = corner
-    let coords = [(a,b) | a <- [y..((screenX - 1)+y)], b <- [x..((screenY - 1)+x)]]
     let wState = World seed pName [(pCoord, humanTile)]
-    let cTiles = map (\c -> loadTile c wState) coords
     screen <- setVideoMode (screenX * 16) (screenY * 16) 32 [SWSurface]
-    mainLoop wState corner screen (array (fst $ head cTiles, fst $ last cTiles) cTiles)
+    mainLoop wState corner screen

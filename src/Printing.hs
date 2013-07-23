@@ -72,22 +72,15 @@ tileSurface (T.Tile (TT.TBlock B.Water) _)     = SDLi.load "textures/water.png"
 tileSurface (T.Tile (TT.TBlock B.DeepWater) _) = SDLi.load "textures/water_deep.png"
 tileSurface tile                               = tileSurface $ T.mainTile tile
 
--- | Prints the image of the world given the world state, the upper left
--- coordinates of the screen and the surface of the screen.
-printCornerImage :: W.WorldState -> Array W.TileCoord T.Tile -> W.Coord -> (T.Tile -> IO SDL.Surface) -> SDL.Surface -> IO (Array W.TileCoord T.Tile)
-printCornerImage ws lTiles (x, y) tileFunc screen = do
-    Rect _ _ sTWidth sTHeight <- getClipRect screen
-    let sWidth  = sTWidth `div` 16 -- ^ divides the width by 16 to get it in terms of tiles
-    let sHeight = sTHeight `div` 16 -- ^ divides the height by 16 to get it in terms of tiles
-    let height  = sHeight - 1
-    let width   = sWidth - 1
-    let coords  = [(b,a) | a <- [y..(height+y)], b <- [x..(width+x)]] -- ^ All the coordinates
-    let cTiles  = map (\c -> W.loadEfficientTile c ws lTiles) coords -- ^ loads all the tiles that will be displayed
-    let cTilesWOffset = map (coordDiff (x,y)) cTiles -- ^ Tiles with its coordinates as offsets to the upper left corner.
+-- | Prints the image of the world given a array of tiles
+-- , the source surfaces and the destination surface.
+printImage :: Array W.TileCoord T.Tile -> (T.Tile -> IO SDL.Surface) -> SDL.Surface -> IO ()
+printImage cTiles tileFunc screen = do
+    let offset        = head $ indices cTiles
+    let cTilesWOffset = zip (map (W.|-| offset) $ indices cTiles) (elems cTiles) -- ^ Tiles with its coordinates as offsets to the upper left corner.
     surfaces <- mapM (tileFunc . snd) cTilesWOffset -- ^ The surfaces of all tiles
     mapM_  (showSTile screen) $ zip (map fst cTilesWOffset) surfaces -- ^ Maps the showSTile to the surfaces with its offsets
     SDL.flip screen -- ^ Flips the screen
-    return $ array (fst $ head cTiles, fst $ last cTiles) cTiles
         where
             -- I know that mix 'let' and 'where' expressions is not good. -.- --
             -- With the surface, it multiplies all the offsets by a quality factor and
@@ -95,7 +88,6 @@ printCornerImage ws lTiles (x, y) tileFunc screen = do
             showSTile src ((a,b),surface) = do
                 Rect _ _ w h <- getClipRect surface
                 applySurface (a*w) (b*h) surface src Nothing
-            coordDiff (x1,y1) ((x2,y2),tile) = (((x2-x1), (y2-y1)),tile) -- ^ The difference betwen two coordinates
 
 -- | Loop that quits itself if an 'Exit'
 -- signalis sent, when the user closes the window.
