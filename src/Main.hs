@@ -18,8 +18,8 @@ import Input
 -- import Random
 
 screenX, screenY :: Int
-screenX = 60
-screenY = 40
+screenX = 40
+screenY = 30
 
 mainASCIIloop :: WorldState -> Coord -> IO ()
 mainASCIIloop ws corner = do
@@ -32,6 +32,7 @@ mainASCIIloop ws corner = do
 mainLoop :: WorldState -> Coord -> Surface -> Array TileCoord Tile -> IO ()
 mainLoop wState corner screen lTiles = do
     newlTiles <- printCornerImage wState lTiles corner tileSurface screen
+    mapM_ (putStrLn . show) (assocs newlTiles)
     maybeNewWorld <- inputAction wState $ fst $ findPlayer wState
     case maybeNewWorld of
         Nothing       -> quit
