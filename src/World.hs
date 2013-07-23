@@ -117,8 +117,8 @@ simpleForest = SBiome cpmMap perlin_ stdMult
     where
         cpmMap value
           | value < 0  = T.Tile (TT.TBlock B.Air) []
-          | value < 10 = T.Tile (TT.TItem I.Wood) []
-          | otherwise  = T.Tile (TT.TBlock B.Wood) []
+          | value < 10 = T.withAir $ T.Tile (TT.TItem I.Wood) []
+          | otherwise  = T.withAir $ T.Tile (TT.TBlock B.Wood) []
         perlin_ seed = perlin seed 5 0.3 0.1
 
 -- | A very simple plains biome made
@@ -129,8 +129,8 @@ simplePlain = SBiome cpmMap perlin_ stdMult
     where
         cpmMap value
           | value < 60 = T.Tile (TT.TBlock B.Air) []
-          | value < 80 = T.Tile (TT.TItem I.Wood) []
-          | otherwise  = T.Tile (TT.TBlock B.Wood) []
+          | value < 80 = T.withAir $ T.Tile (TT.TItem I.Wood) []
+          | otherwise  = T.withAir $ T.Tile (TT.TBlock B.Wood) []
         perlin_ seed = perlin seed 5 0.3 0.1
 
 simpleOcean :: SimpleBiome
@@ -141,7 +141,7 @@ simpleOcean = SBiome cpmMap perlin_ stdMult
           | value < 60 = T.Tile (TT.TBlock B.Water) []
           | value < 85 = T.Tile (TT.TBlock B.Sand) []
           | otherwise  = T.Tile (TT.TBlock B.Air) []
-        perlin_ seed = perlin seed 5 0.2 0.01
+        perlin_ seed = perlin seed 5 0.2 0.1
 
 -- | A WorldState is made of a Seed, a Name of the World
 -- and a list of modified tiles and its coordinates.
