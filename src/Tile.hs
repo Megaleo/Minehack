@@ -100,3 +100,11 @@ isTileBlock tile        = isTileBlock $ mainTile tile
 isTileItem :: Tile -> Bool
 isTileItem (Tile tt _) = TT.isOnlyItem tt
 isTileItem tile        = isTileItem $ mainTile tile
+
+visibleTile :: Tile -> Tile
+visibleTile (Above (Tile (TT.TBlock B.Air) _) t)  = visibleTile t
+visibleTile (Inside t (Tile (TT.TBlock B.Air) _)) = visibleTile t
+visibleTile (Tiles t1 _)                          = visibleTile t1
+visibleTile (Above t1 _)                          = visibleTile t1
+visibleTile (Inside _ t2)                         = visibleTile t2
+visibleTile tile                                  = tile
