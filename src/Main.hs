@@ -18,9 +18,11 @@ import Input
 -- import Random
 
 screenX, screenY :: Int
-screenX = 80
-screenY = 60
+screenX = 60
+screenY = 45
 
+-- | Prints the world in form of ASCII and
+-- runs a input loop, like in mainLoop.
 mainASCIIloop :: WorldState -> Coord -> IO ()
 mainASCIIloop ws corner = do
     printCorner ws corner (screenX,screenY)
@@ -29,6 +31,8 @@ mainASCIIloop ws corner = do
         Nothing       -> quit
         Just newWorld -> mainASCIIloop newWorld (findCorner (screenX,screenY) $ fst $ findPlayer newWorld)
 
+-- | Loads and prints the world  every
+-- time an input event is triggered.
 mainLoop :: WorldState -> Coord -> Surface -> IO ()
 mainLoop wState (x, y) screen = do
     let height  = screenY - 1
@@ -41,6 +45,7 @@ mainLoop wState (x, y) screen = do
         Nothing       -> quit
         Just newWorld -> mainLoop newWorld (findCorner (screenX,screenY) $ fst $ findPlayer newWorld) screen
 
+-- | Main function
 main :: IO ()
 main = withInit [InitEverything] $ do
     putStr "Seed: "
