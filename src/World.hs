@@ -14,6 +14,8 @@ module World where
 
 import Data.Array
 import Data.List
+import Data.IORef
+import Data.StateVar
 
 import Numeric.Noise
 import Numeric.Noise.Perlin
@@ -49,6 +51,9 @@ tileChunk :: TileCoord -> ChunkCoord
 tileChunk (x, y) = (new x, new y)
   where
     new var = var `div` 16
+
+chunkCoord:: Chunk -> ChunkCoord
+chunkCoord = tileChunk . fst . bounds
 
 -- | The range of tiles coordinates of a Chunk.
 chunkRange :: ChunkCoord -> (TileCoord, TileCoord)
@@ -228,3 +233,31 @@ deleteTile (c, t) tiles = case lookup c tiles of
 
 wsTiles :: WorldState -> [CTile]
 wsTiles (World _ _ tiles) = tiles
+
+-------------------------
+-- Automatic loading
+-------------------------
+
+-- | IORef for already loaded chunks
+loadedChunks :: IO (IORef [Chunk])
+loadedChunks = newIORef ([] :: [Chunk])
+
+-- | IORef for chunk coordinates to load
+chunkQuery :: IO (IORef [ChunkCoord])
+chunkQuery = newIORef ([] :: [ChunkCoord])
+
+-- | Remove a Chunk Coordinate from 'chunkQuery'
+removeFromQuery :: ChunkCoord -> IO ()
+removeFromQuery c = chunkQuery >>= ($~ delete c)
+
+-- | Remove a Chunk from its coordinates using 'loadedChunks'
+removeCoordFromloadedChunks :: ChunkCoord -> IO ()
+removeCoordFromloadedChunks c = loadedChunks >>= ($~ deleteBy (\y x -> chunkCoord y == chunkCoord x) (array (c,c) []))
+
+-- | Adds a Chunk Coordinate to 'chunkQuery'
+addToQuery :: ChunkCoord -> IO ()
+addToQuery c = chunkQuery >>= ($~ (c :))
+
+-- | Adds a Chunk to 'loadedChunks'
+addCoordToloadedChunks :: Chunk -> IO ()
+addCoordToloadedChunks chunk = loadedChunks >>= ($~ (chunk :))
