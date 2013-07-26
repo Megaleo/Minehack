@@ -16,6 +16,7 @@ import Data.Array
 import Data.List
 import Data.IORef
 import Data.StateVar
+import Control.Concurrent (threadDelay)
 
 import Numeric.Noise
 import Numeric.Noise.Perlin
@@ -238,26 +239,55 @@ wsTiles (World _ _ tiles) = tiles
 -- Automatic loading
 -------------------------
 
--- | IORef for already loaded chunks
+-- | IORef for already loaded chunks.
 loadedChunks :: IO (IORef [Chunk])
 loadedChunks = newIORef ([] :: [Chunk])
 
--- | IORef for chunk coordinates to load
+-- | IORef for chunk coordinates to load.
 chunkQuery :: IO (IORef [ChunkCoord])
 chunkQuery = newIORef ([] :: [ChunkCoord])
 
--- | Remove a Chunk Coordinate from 'chunkQuery'
+-- | Do a function using loadedChunks IORef.
+loadedChunksDo :: (IORef [Chunk] -> IO a) -> IO a
+loadedChunksDo = (loadedChunks >>=)
+
+-- | Get the loaded chunks and aplies a function it.
+loadedChunksGet :: ([Chunk] -> IO a) -> IO a
+loadedChunksGet = (loadedChunks >>= get >>=)
+
+-- | Do a function using chunk query IORef.
+chunkQueryDo :: (IORef [ChunkCoord] -> IO a) -> IO a
+chunkQueryDo = (chunkQuery >>=)
+
+-- | Get the chunk Query and aplies a function to it.
+chunkQueryGet :: ([ChunkCoord] -> IO a) -> IO a
+chunkQueryGet = (chunkQuery >>= get >>=)
+
+-- | Remove a Chunk Coordinate from 'chunkQuery'.
 removeFromQuery :: ChunkCoord -> IO ()
-removeFromQuery c = chunkQuery >>= ($~ delete c)
+removeFromQuery c = chunkQueryDo ($~ delete c)
 
--- | Remove a Chunk from its coordinates using 'loadedChunks'
+-- | Remove a Chunk from its coordinates using 'loadedChunks'.
 removeCoordFromloadedChunks :: ChunkCoord -> IO ()
-removeCoordFromloadedChunks c = loadedChunks >>= ($~ deleteBy (\y x -> chunkCoord y == chunkCoord x) (array (c,c) []))
+removeCoordFromloadedChunks c = loadedChunksDo ($~ deleteBy (\y x -> chunkCoord y == chunkCoord x) (array (c,c) []))
 
--- | Adds a Chunk Coordinate to 'chunkQuery'
+-- | Remove a Chunk using 'loadedChunks'.
+removeFromloadedChunks :: Chunk -> IO ()
+removeFromloadedChunks c = loadedChunksDo ($~ delete c)
+
+-- | Adds a Chunk Coordinate to 'chunkQuery'.
 addToQuery :: ChunkCoord -> IO ()
 addToQuery c = chunkQuery >>= ($~ (c :))
 
 -- | Adds a Chunk to 'loadedChunks'
-addCoordToloadedChunks :: Chunk -> IO ()
-addCoordToloadedChunks chunk = loadedChunks >>= ($~ (chunk :))
+addCoordToLoadedChunks :: [Chunk] -> IO ()
+addCoordToLoadedChunks chunks = loadedChunksDo ($~ (chunks ++))
+
+-- | Generates chunks given the coordinates and the worldState,
+-- it stores the results on 'loadedChunks'.
+generateChunks :: [ChunkCoord] -> WorldState -> IO ()
+generateChunks ccs ws = addCoordToLoadedChunks $ map (flip loadChunk ws) ccs
+
+-- | Generate chunks from Query list.
+generateFromQuery :: WorldState ->  IO ()
+generateFromQuery ws = chunkQueryGet $ flip generateChunks ws
