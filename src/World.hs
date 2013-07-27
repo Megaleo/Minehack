@@ -16,8 +16,6 @@ import Data.Array
 import Data.List
 import Data.IORef
 import Data.StateVar
-import Control.Concurrent (threadDelay)
-import Control.Monad
 
 import Numeric.Noise
 import Numeric.Noise.Perlin
@@ -289,9 +287,6 @@ addChunksToLoadedChunks chunks = loadedChunksDo ($~ (chunks ++))
 generateChunks :: [ChunkCoord] -> WorldState -> IO ()
 generateChunks ccs ws = addChunksToLoadedChunks $ map (flip loadChunk ws) ccs
 
-chunkCoordMap :: (ChunkCoord -> a) -> [Chunk] -> a
-chunkCoordMap func chunks = undefined
-
 -- | Generates chunks given the coordinates and the worldState,
 -- it stores the results on 'loadedChunks' and removes de coordinates
 -- from the 'chunkQuery'.
@@ -302,4 +297,4 @@ generateChunksRemove ccs ws = chunks >>= mapM_ removeFromloadedChunks >> chunks 
 
 -- | Generate chunks from Query list.
 generateFromQuery :: WorldState ->  IO ()
-generateFromQuery ws = chunkQueryGet $ flip generateChunks ws
+generateFromQuery ws = chunkQueryGet $ flip generateChunksRemove ws
