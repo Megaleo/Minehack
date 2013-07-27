@@ -17,6 +17,7 @@ import Data.List
 import Data.IORef
 import Data.StateVar
 import Control.Concurrent (threadDelay)
+import Control.Monad
 
 import Numeric.Noise
 import Numeric.Noise.Perlin
@@ -280,13 +281,24 @@ addToQuery :: ChunkCoord -> IO ()
 addToQuery c = chunkQuery >>= ($~ (c :))
 
 -- | Adds a Chunk to 'loadedChunks'
-addCoordToLoadedChunks :: [Chunk] -> IO ()
-addCoordToLoadedChunks chunks = loadedChunksDo ($~ (chunks ++))
+addChunksToLoadedChunks :: [Chunk] -> IO ()
+addChunksToLoadedChunks chunks = loadedChunksDo ($~ (chunks ++))
 
 -- | Generates chunks given the coordinates and the worldState,
 -- it stores the results on 'loadedChunks'.
 generateChunks :: [ChunkCoord] -> WorldState -> IO ()
-generateChunks ccs ws = addCoordToLoadedChunks $ map (flip loadChunk ws) ccs
+generateChunks ccs ws = addChunksToLoadedChunks $ map (flip loadChunk ws) ccs
+
+chunkCoordMap :: (ChunkCoord -> a) -> [Chunk] -> a
+chunkCoordMap func chunks = undefined
+
+-- | Generates chunks given the coordinates and the worldState,
+-- it stores the results on 'loadedChunks' and removes de coordinates
+-- from the 'chunkQuery'.
+generateChunksRemove :: [ChunkCoord] -> WorldState -> IO ()
+generateChunksRemove ccs ws = chunks >>= mapM_ removeFromloadedChunks >> chunks >>= addChunksToLoadedChunks
+  where
+    chunks = mapM (\c -> removeFromQuery c >> (return $ loadChunk c ws)) ccs
 
 -- | Generate chunks from Query list.
 generateFromQuery :: WorldState ->  IO ()
