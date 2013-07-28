@@ -306,3 +306,7 @@ generateChunksRemove ccs ws = chunks >>= mapM_ removeFromloadedChunks >> chunks 
 -- | Generate chunks from Query list.
 generateFromQuery :: WorldState ->  IO ()
 generateFromQuery ws = chunkQueryGet $ flip generateChunksRemove ws
+
+-- | Returns loaded chunks
+getLoadedChunks :: IO [Chunk]
+getLoadedChunks = loadedChunksGet return
