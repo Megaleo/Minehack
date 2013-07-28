@@ -274,6 +274,14 @@ removeCoordFromloadedChunks c = loadedChunksDo ($~ deleteBy (\y x -> chunkCoord 
 removeFromloadedChunks :: Chunk -> IO ()
 removeFromloadedChunks c = loadedChunksDo ($~ delete c)
 
+-- | Removes all loaded chunks.
+clearLoadedChunks :: IO ()
+clearLoadedChunks = loadedChunksDo ($= [])
+
+-- | Removes all chunk coordinates from chunk query.
+clearChunkQuery :: IO ()
+clearChunkQuery = chunkQueryDo ($= [])
+
 -- | Adds a Chunk Coordinate to 'chunkQuery'.
 addToQuery :: ChunkCoord -> IO ()
 addToQuery c = chunkQuery >>= ($~ (c :))
