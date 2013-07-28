@@ -200,6 +200,13 @@ loadTile c (World seed _ tiles) = case lookup c tiles of
                                                       value1 = fromEnum $ (multiplierM stdBiomeMap) * (twoD (toEnum $ fst $ tileChunk c) (toEnum $ snd $ tileChunk c) ((perlinArgsM stdBiomeMap) seed))
                                                       value2 = fromEnum $ (multiplier sBiome) * (twoD (toEnum $ fst c) (toEnum $ snd c) ((perlinArgs sBiome) seed))
 
+-- | Loads a tile like 'loadTile' but the natural
+-- perlin generation of it is replaced by an array.
+loadExternalTile :: TileCoord -> WorldState -> Array TileCoord T.Tile -> CTile
+loadExternalTile c (World _ _ tiles) ext = case lookup c tiles of
+                                               Just t  -> (c,t)
+                                               Nothing -> (c, ext ! c)
+
 -- | Verifies if an CTile exist in an WorldState.
 existInTiles :: CTile -> WorldState -> Bool
 existInTiles ctile (World _ _ tiles) = ctile `elem` tiles
@@ -208,7 +215,7 @@ existInTiles ctile (World _ _ tiles) = ctile `elem` tiles
 -- exists in the WorldState.
 returnTile :: CTile -> WorldState -> Maybe CTile
 returnTile ctile ws = if existInTiles ctile ws
-                          then Just ctile
+                            then Just ctile
                           else Nothing
 
 -- | If a tile is already modified in the World State, then
