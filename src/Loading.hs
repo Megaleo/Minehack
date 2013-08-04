@@ -4,6 +4,7 @@ import Data.StateVar
 import Data.IORef
 import Data.Array
 import Data.List
+import Control.Concurrent
 
 import qualified World as W
 
@@ -77,3 +78,13 @@ generateFromQuery chunkQuery loadedChunks ws = chunkQueryGet chunkQuery $ \ccs -
 -- | Returns loaded chunks
 getLoadedChunks :: IORef [W.Chunk] -> IO [W.Chunk]
 getLoadedChunks loadedChunks = loadedChunksGet loadedChunks return
+
+-- | Loads and generates constantly from a World State.
+loadingLoop :: World -> Int -> IO ()
+loadingLoop world@(World loadedChunks chunkQuery ioWorldState) delay = do
+    query <- get chunkQuery
+    if null query
+        then threadDelay delay >> loadingLoop world delay
+        else do
+            get ioWorldState >>= generateFromQuery chunkQuery loadedChunks
+            loadingLoop world delay
