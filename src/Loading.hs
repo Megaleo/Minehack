@@ -5,75 +5,75 @@ import Data.IORef
 import Data.Array
 import Data.List
 
-import World
+import qualified World as W
 
 
-data World = World { worldLoadedChunks :: IORef [Chunk]
-                   , worldChunkQuery   :: IORef [ChunkCoord]
-                   , worldState   :: IORef WorldState
+data World = World { worldLoadedChunks :: IORef [W.Chunk]
+                   , worldChunkQuery   :: IORef [W.ChunkCoord]
+                   , worldState        :: IORef W.WorldState
                    } deriving Eq
 
 -- | IORef for already loaded chunks.
-newLoadedChunks :: IO (IORef [Chunk])
-newLoadedChunks = newIORef ([] :: [Chunk])
+newLoadedChunks :: IO (IORef [W.Chunk])
+newLoadedChunks = newIORef ([] :: [W.Chunk])
 
 -- | IORef for chunk coordinates to load.
-newChunkQuery :: IO (IORef [ChunkCoord])
-newChunkQuery = newIORef ([] :: [ChunkCoord])
+newChunkQuery :: IO (IORef [W.ChunkCoord])
+newChunkQuery = newIORef ([] :: [W.ChunkCoord])
 
 -- | Get the loaded chunks and aplies a function it.
-loadedChunksGet :: IORef [Chunk] -> ([Chunk] -> IO a) -> IO a
+loadedChunksGet :: IORef [W.Chunk] -> ([W.Chunk] -> IO a) -> IO a
 loadedChunksGet loadedChunks = (get loadedChunks >>=)
 
 -- | Get the chunk Query and aplies a function to it.
-chunkQueryGet :: IORef [ChunkCoord] -> ([ChunkCoord] -> IO a) -> IO a
+chunkQueryGet :: IORef [W.ChunkCoord] -> ([W.ChunkCoord] -> IO a) -> IO a
 chunkQueryGet chunkQuery = (get chunkQuery >>=)
 
 -- | Remove a Chunk Coordinate from 'chunkQuery'.
-removeFromQuery :: IORef [ChunkCoord] -> ChunkCoord -> IO ()
+removeFromQuery :: IORef [W.ChunkCoord] -> W.ChunkCoord -> IO ()
 removeFromQuery chunkQuery c = chunkQuery $~ delete c
 
 -- | Remove a Chunk from its coordinates using 'loadedChunks'.
-removeCoordFromloadedChunks :: IORef [Chunk] -> ChunkCoord -> IO ()
-removeCoordFromloadedChunks loadedChunks c = loadedChunks $~ deleteBy (\y x -> chunkCoord y == chunkCoord x) (array (c,c) [])
+removeCoordFromloadedChunks :: IORef [W.Chunk] -> W.ChunkCoord -> IO ()
+removeCoordFromloadedChunks loadedChunks c = loadedChunks $~ deleteBy (\y x -> W.chunkCoord y == W.chunkCoord x) (array (c,c) [])
 
 -- | Remove a Chunk using 'loadedChunks'.
-removeFromloadedChunks :: IORef [Chunk] -> Chunk -> IO ()
+removeFromloadedChunks :: IORef [W.Chunk] -> W.Chunk -> IO ()
 removeFromloadedChunks loadedChunks c = loadedChunks $~ delete c
 
 -- | Removes all loaded chunks.
-clearLoadedChunks :: IORef [Chunk] -> IO ()
+clearLoadedChunks :: IORef [W.Chunk] -> IO ()
 clearLoadedChunks loadedChunks = loadedChunks $= []
 
 -- | Removes all chunk coordinates from chunk query.
-clearChunkQuery :: IORef [ChunkCoord] -> IO ()
+clearChunkQuery :: IORef [W.ChunkCoord] -> IO ()
 clearChunkQuery chunkQuery = chunkQuery $= []
 
 -- | Adds a Chunk Coordinate to 'chunkQuery'.
-addToQuery :: IORef [ChunkCoord] -> ChunkCoord -> IO ()
+addToQuery :: IORef [W.ChunkCoord] -> W.ChunkCoord -> IO ()
 addToQuery chunkQuery c = chunkQuery $~ (c :)
 
 -- | Adds a Chunk to 'loadedChunks'
-addChunksToLoadedChunks :: IORef [Chunk] -> [Chunk] -> IO ()
+addChunksToLoadedChunks :: IORef [W.Chunk] -> [W.Chunk] -> IO ()
 addChunksToLoadedChunks loadedChunks chunks = loadedChunks $~ (chunks ++)
 
--- | Generates chunks given the coordinates and the worldState,
+-- | Generates chunks given the coordinates and the W.worldState,
 -- it stores the results on 'loadedChunks'.
-generateChunks :: IORef [Chunk] -> [ChunkCoord] -> WorldState -> IO ()
-generateChunks loadedChunks ccs ws = addChunksToLoadedChunks loadedChunks $ map (flip loadChunk ws) ccs
+generateChunks :: IORef [W.Chunk] -> [W.ChunkCoord] -> W.WorldState -> IO ()
+generateChunks loadedChunks ccs ws = addChunksToLoadedChunks loadedChunks $ map (flip W.loadChunk ws) ccs
 
--- | Generates chunks given the coordinates and the worldState,
+-- | Generates chunks given the coordinates and the W.worldState,
 -- it stores the results on 'loadedChunks' and removes de coordinates
 -- from the 'chunkQuery'.
-generateChunksRemove :: IORef [ChunkCoord] -> IORef [Chunk] -> [ChunkCoord] -> WorldState -> IO ()
+generateChunksRemove :: IORef [W.ChunkCoord] -> IORef [W.Chunk] -> [W.ChunkCoord] -> W.WorldState -> IO ()
 generateChunksRemove chunkQuery loadedChunks ccs ws = chunks >>= mapM_ (removeFromloadedChunks loadedChunks) >> chunks >>= addChunksToLoadedChunks loadedChunks
   where
-    chunks = mapM (\c -> removeFromQuery chunkQuery c >> (return $ loadChunk c ws)) ccs
+    chunks = mapM (\c -> removeFromQuery chunkQuery c >> (return $ W.loadChunk c ws)) ccs
 
 -- | Generate chunks from Query list.
-generateFromQuery :: IORef [ChunkCoord] -> IORef [Chunk] -> WorldState ->  IO ()
+generateFromQuery :: IORef [W.ChunkCoord] -> IORef [W.Chunk] -> W.WorldState ->  IO ()
 generateFromQuery chunkQuery loadedChunks ws = chunkQueryGet chunkQuery $ \ccs -> generateChunksRemove chunkQuery loadedChunks ccs ws
 
 -- | Returns loaded chunks
-getLoadedChunks :: IORef [Chunk] -> IO [Chunk]
+getLoadedChunks :: IORef [W.Chunk] -> IO [W.Chunk]
 getLoadedChunks loadedChunks = loadedChunksGet loadedChunks return
