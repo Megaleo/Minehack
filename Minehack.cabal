@@ -64,7 +64,7 @@ executable Minehack
     Tile
     Tile.TileType
     World
-    World.Loading
+    Loading
     Saving
     Entity.Player
     Entity.Mob
