@@ -238,3 +238,8 @@ deleteTile (c, t) tiles = case lookup c tiles of
 
 wsTiles :: WorldState -> [CTile]
 wsTiles (World _ _ tiles) = tiles
+
+-- | Returns all chunks covered in a tile area.
+chunksInArea :: [TileCoord] -> [ChunkCoord]
+chunksInArea (tc : tcs) = [tileChunk tc] `union` chunksInArea tcs
+chunksInArea []        = []
