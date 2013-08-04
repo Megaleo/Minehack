@@ -239,7 +239,6 @@ deleteTile (c, t) tiles = case lookup c tiles of
 wsTiles :: WorldState -> [CTile]
 wsTiles (World _ _ tiles) = tiles
 
--- | Returns all chunks covered in a tile area.
-chunksInArea :: [TileCoord] -> [ChunkCoord]
-chunksInArea (tc : tcs) = [tileChunk tc] `union` chunksInArea tcs
-chunksInArea []        = []
+-- | Returns all chunks covered in a screen.
+chunksInScreen :: TileCoord -> Coord -> [ChunkCoord]
+chunksInScreen corner (w, h) = [tileChunk corner |+| (x, y) | x <- [0 .. w `div` 16], y <- [0 .. h `div` 16]]
