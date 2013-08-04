@@ -7,6 +7,12 @@ import Data.List
 
 import World
 
+
+data World = World { worldLoadedChunks :: IORef [Chunk]
+                   , worldChunkQuery   :: IORef [ChunkCoord]
+                   , worldState   :: IORef WorldState
+                   } deriving Eq
+
 -- | IORef for already loaded chunks.
 newLoadedChunks :: IO (IORef [Chunk])
 newLoadedChunks = newIORef ([] :: [Chunk])
