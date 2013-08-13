@@ -62,7 +62,9 @@ executable Minehack
     Player
     Random
     Tile
+    Tile.TileType
     World
+    Loading
     Saving
     Entity.Player
     Entity.Mob

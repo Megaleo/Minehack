@@ -50,6 +50,9 @@ tileChunk (x, y) = (new x, new y)
   where
     new var = var `div` 16
 
+chunkCoord:: Chunk -> ChunkCoord
+chunkCoord = tileChunk . fst . bounds
+
 -- | The range of tiles coordinates of a Chunk.
 chunkRange :: ChunkCoord -> (TileCoord, TileCoord)
 chunkRange (x, y) = ((min_ x, min_ y),(max_ x, max_ y))
@@ -195,19 +198,12 @@ loadTile c (World seed _ tiles) = case lookup c tiles of
                                                       value1 = fromEnum $ (multiplierM stdBiomeMap) * (twoD (toEnum $ fst $ tileChunk c) (toEnum $ snd $ tileChunk c) ((perlinArgsM stdBiomeMap) seed))
                                                       value2 = fromEnum $ (multiplier sBiome) * (twoD (toEnum $ fst c) (toEnum $ snd c) ((perlinArgs sBiome) seed))
 
-forceLoadTile :: TileCoord -> Int -> CTile
-forceLoadTile c seed = (c, (cpmFunc ((cpmFuncM stdBiomeMap) value1) value2))
-                           where
-                               sBiome = (cpmFuncM stdBiomeMap) value1
-                               value1 = fromEnum $ (multiplierM stdBiomeMap) * (twoD (toEnum $ fst $ tileChunk c) (toEnum $ snd $ tileChunk c) ((perlinArgsM stdBiomeMap) seed))
-                               value2 = fromEnum $ (multiplier sBiome) * (twoD (toEnum $ fst c) (toEnum $ snd c) ((perlinArgs sBiome) seed))
-
-loadEfficientTile :: TileCoord -> WorldState -> Array TileCoord T.Tile -> CTile
-loadEfficientTile c (World seed _ tiles) lTiles = case lookup c tiles of
-                                                      Just t  -> (c,t)
-                                                      Nothing -> if inRange (bounds lTiles) c
-                                                                 then (c, lTiles ! c)
-                                                                 else forceLoadTile c seed
+-- | Loads a tile like 'loadTile' but the natural
+-- perlin generation of it is replaced by an array.
+loadExternalTile :: TileCoord -> WorldState -> Array TileCoord T.Tile -> CTile
+loadExternalTile c (World _ _ tiles) ext = case lookup c tiles of
+                                               Just t  -> (c,t)
+                                               Nothing -> (c, ext ! c)
 
 -- | Verifies if an CTile exist in an WorldState.
 existInTiles :: CTile -> WorldState -> Bool
@@ -217,7 +213,7 @@ existInTiles ctile (World _ _ tiles) = ctile `elem` tiles
 -- exists in the WorldState.
 returnTile :: CTile -> WorldState -> Maybe CTile
 returnTile ctile ws = if existInTiles ctile ws
-                          then Just ctile
+                            then Just ctile
                           else Nothing
 
 -- | If a tile is already modified in the World State, then
@@ -242,3 +238,7 @@ deleteTile (c, t) tiles = case lookup c tiles of
 
 wsTiles :: WorldState -> [CTile]
 wsTiles (World _ _ tiles) = tiles
+
+-- | Returns all chunks covered in a screen.
+chunksInScreen :: TileCoord -> Coord -> [ChunkCoord]
+chunksInScreen corner (w, h) = [tileChunk corner |+| (x, y) | x <- [0 .. w `div` 16], y <- [0 .. h `div` 16]]
