@@ -70,24 +70,25 @@ tileSurface (T.Tile (TT.TEntity _) _)          = SDLi.load "textures/human.png"
 tileSurface (T.Tile (TT.TBlock B.Sand) _)      = SDLi.load "textures/Sand.png"
 tileSurface (T.Tile (TT.TBlock B.Water) _)     = SDLi.load "textures/water.png"
 tileSurface (T.Tile (TT.TBlock B.DeepWater) _) = SDLi.load "textures/water_deep.png"
-tileSurface tile                               = tileSurface $ T.mainTile tile
+tileSurface tile                               = tileSurface $ T.visibleTile tile
+
+-- | Gets CTiles and returns its surfaces and
+-- coordinates on screen on some offset.
+makeTileSurface :: W.Coord -> (T.Tile -> IO SDL.Surface) -> [W.CTile] -> [(W.Coord, IO SDL.Surface)]
+makeTileSurface offset tileFunc cTiles = zip (map ((W.|-| offset) . fst) cTiles) $ map (tileFunc . snd) cTiles
 
 -- | Prints the image of the world given a array of tiles
 -- , the source surfaces and the destination surface.
-printImage :: Array W.TileCoord T.Tile -> (T.Tile -> IO SDL.Surface) -> SDL.Surface -> IO ()
-printImage cTiles tileFunc screen = do
-    let offset        = head $ indices cTiles
-    let cTilesWOffset = zip (map (W.|-| offset) $ indices cTiles) (elems cTiles) -- ^ Tiles with its coordinates as offsets to the upper left corner.
-    surfaces <- mapM (tileFunc . snd) cTilesWOffset -- ^ The surfaces of all tiles
-    mapM_  (showSTile screen) $ zip (map fst cTilesWOffset) surfaces -- ^ Maps the showSTile to the surfaces with its offsets
+printImage :: [(W.Coord, IO SDL.Surface)] -> SDL.Surface -> IO ()
+printImage surfaces screen = do
+    fillRect screen Nothing $ Pixel 0
+    mapM_  (showSTile screen) surfaces -- ^ Maps the showSTile to the surfaces with its offsets
     SDL.flip screen -- ^ Flips the screen
         where
-            -- I know that mix 'let' and 'where' expressions is not good. -.- --
-            -- With the surface, it multiplies all the offsets by a quality factor and
-            -- uses 'applySurface' to blit to the source surface.
-            showSTile src ((a,b),surface) = do
+            showSTile src ((a,b),ioSurface) = do
+                surface <- ioSurface
                 Rect _ _ w h <- getClipRect surface
-                applySurface (a*w) (b*h) surface src Nothing
+                applySurface (h * a) (w * b) surface src    Nothing
 
 -- | Loop that quits itself if an 'Exit'
 -- signalis sent, when the user closes the window.
