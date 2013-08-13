@@ -48,10 +48,10 @@ fromTileID (ID 3 mobId)
             returnMob _                             = error "It is impossible to get here"
 fromTileID (ID 4 _)       = Just $ TEntity $ E.EMob EM.Horse
 fromTileID (ID 5 _)       = Just $ TEntity $ E.EMob EM.Olimpio
-fromTileID _ = Nothing
 fromTileID (ID 6 _)       = Just $ TBlock B.Water
 fromTileID (ID 7 _)       = Just $ TBlock B.DeepWater
 fromTileID (ID 8 _)       = Just $ TBlock B.Sand
+fromTileID _              = Nothing
 
 
 -- | TileType's unique symbol.

@@ -6,11 +6,16 @@ module Main where
 
 import Graphics.UI.SDL
 import Data.Array
+import Data.StateVar
+import Data.IORef
+import Data.List
+import Control.Concurrent
 
 import World
 import Tile
 import Printing
 import Input
+import Loading
 -- import Item
 -- import Block
 -- import Player
@@ -18,9 +23,13 @@ import Input
 -- import Random
 
 screenX, screenY :: Int
-screenX = 40
-screenY = 30
+screenX = 60
+screenY = 45
 
+-- | Prints the world in form of ASCII and
+-- runs a input loop, like in mainLoop.
+--
+-- UNUSED
 mainASCIIloop :: WorldState -> Coord -> IO ()
 mainASCIIloop ws corner = do
     printCorner ws corner (screenX,screenY)
@@ -29,15 +38,29 @@ mainASCIIloop ws corner = do
         Nothing       -> quit
         Just newWorld -> mainASCIIloop newWorld (findCorner (screenX,screenY) $ fst $ findPlayer newWorld)
 
-mainLoop :: WorldState -> Coord -> Surface -> Array TileCoord Tile -> IO ()
-mainLoop wState corner screen lTiles = do
-    newlTiles <- printCornerImage wState lTiles corner tileSurface screen
-    mapM_ (putStrLn . show) (assocs newlTiles)
+-- | Loads and prints the world  every
+-- time an input event is triggered.
+mainLoop :: World -> Coord -> Surface -> IO ()
+mainLoop (Loading.World ioLoadedChunks ioChunkQuery ioWState) (x, y) screen = do
+    wState <- get ioWState
+    loadedChunks <- get ioLoadedChunks
+    let chunksToLoad = chunksInScreen (x - 16, y - 16) (screenX + 32, screenY + 32)
+    mapM (addToQuery ioChunkQuery) (chunksToLoad \\ map chunkCoord loadedChunks)
+    let upperLeftChunk = tileChunk (x , y)
+    let downRightChunk = tileChunk $ (x, y) |+| (screenX, screenY)
+    let neededChunks = filter (\c -> inRange (upperLeftChunk, downRightChunk) (chunkCoord c) ) loadedChunks
+    let cTilesTotal = concatMap assocs neededChunks
+    let cTiles = filter (inRange ((x, y), (x, y) |+| (screenX, screenY)) . fst) cTilesTotal
+    let surfaces = makeTileSurface (x, y) tileSurface (cTiles `union` wsTiles wState)
+    printImage surfaces screen
     maybeNewWorld <- inputAction wState $ fst $ findPlayer wState
     case maybeNewWorld of
         Nothing       -> quit
-        Just newWorld -> mainLoop newWorld (findCorner (screenX,screenY) $ fst $ findPlayer newWorld) screen newlTiles
+        Just newWorld -> do
+            ioWState $= newWorld
+            mainLoop (Loading.World ioLoadedChunks ioChunkQuery ioWState) (findCorner (screenX,screenY) $ fst $ findPlayer newWorld) screen
 
+-- | Main function
 main :: IO ()
 main = withInit [InitEverything] $ do
     putStr "Seed: "
@@ -48,9 +71,11 @@ main = withInit [InitEverything] $ do
     pName <- getLine
     setCaption (show seed ++ ": " ++ pName) []
     let corner = findCorner (screenX,screenY) pCoord
-    let (x,y)  = corner
-    let coords = [(a,b) | a <- [y..((screenX - 1)+y)], b <- [x..((screenY - 1)+x)]]
-    let wState = World seed pName [(pCoord, humanTile)]
-    let cTiles = map (\c -> loadTile c wState) coords
+    let wState = World.World seed pName [(pCoord, humanTile)]
+    loadedChunks <- newLoadedChunks
+    chunkQuery <- newChunkQuery
+    ioWState <- newIORef wState
+    let localWorld = Loading.World loadedChunks chunkQuery ioWState
+    forkIO $ loadingLoop localWorld 100
     screen <- setVideoMode (screenX * 16) (screenY * 16) 32 [SWSurface]
-    mainLoop wState corner screen (array (fst $ head cTiles, fst $ last cTiles) cTiles)
+    mainLoop localWorld corner screen
